@@ -1,11 +1,11 @@
 name: Scrape Competitor Prices
 
 on:
-  schedule:
-    # Run daily at 06:00 UTC (before European business hours start)
-    - cron: '0 6 * * *'
+  # PAUSED: re-add the schedule block below when ready to activate
+  # schedule:
+  #   - cron: '0 6 * * *'
   workflow_dispatch:
-    # Allow manual trigger from GitHub Actions UI
+    # Manual trigger only — run from GitHub Actions UI when needed
 
 jobs:
   scrape:
