@@ -120,10 +120,10 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                   background: theme.chartBar,
                   borderRadius: 4,
                 }} />
-                {/* Median circle — same vertical center as bar (mid - 5 to mid + 5) */}
+                {/* Center dot — midpoint between min and max */}
                 <div style={{
                   position: 'absolute',
-                  left: `${pct(pp.median)}%`,
+                  left: `${pct((pp.min + pp.max) / 2)}%`,
                   top: mid - 5,
                   width: 10,
                   height: 10,
