@@ -28,9 +28,10 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme }: Pr
         <img
           src="/elli-logo.png"
           alt="Elli"
-          height={34}
+          height={24}
           style={{
             display: 'block',
+            maxWidth: '60px',
             filter: isDark
               ? 'invert(1)'
               : 'invert(31%) sepia(83%) saturate(800%) hue-rotate(255deg) brightness(85%)',
