@@ -1,5 +1,4 @@
 import { Clock, Sun, Moon } from 'lucide-react';
-import ElliLogo from './ElliLogo';
 import type { Theme } from '../theme';
 
 interface Props {
@@ -25,7 +24,18 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme }: Pr
       justifyContent: 'space-between',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <ElliLogo color={isDark ? '#FFFFFF' : '#7B2FBE'} height={34} />
+        {/* Logo: black PNG recolored via CSS filter — purple in light, white in dark */}
+        <img
+          src="/elli-logo.png"
+          alt="Elli"
+          height={34}
+          style={{
+            display: 'block',
+            filter: isDark
+              ? 'invert(1)'
+              : 'invert(31%) sepia(83%) saturate(800%) hue-rotate(255deg) brightness(85%)',
+          }}
+        />
         <div style={{ width: 1, height: 28, background: theme.border }} />
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: theme.text }}>Pricing Signals Dashboard</div>
