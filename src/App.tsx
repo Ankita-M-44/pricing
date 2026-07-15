@@ -106,8 +106,7 @@ export default function App() {
         <div style={{ background: theme.surface, borderRadius: 14, border: `1px solid ${theme.border}`, padding: '36px 32px 28px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
             <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: theme.text }}>Price Corridor Benchmark</div>
-              <div style={{ fontSize: 12, color: '#00C896', marginTop: 2 }}>Side-by-side comparison vs. leading providers in AC & DC charging</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: theme.text }}>Side-by-side Fleet tariff comparison with other providers</div>
             </div>
             <div style={{ display: 'flex', background: theme.inputBg, borderRadius: 24, padding: 4, border: `1px solid ${theme.borderSubtle}` }}>
               <TabButton active={type === 'ac'} onClick={() => setType('ac')} theme={theme}>AC</TabButton>

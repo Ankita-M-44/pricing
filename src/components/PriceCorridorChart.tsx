@@ -30,7 +30,10 @@ interface ElliMarker {
 function getElliMarkersForRow(provider: ElliProvider, type: ChargingType): ElliMarker[] {
   const tier = provider.tiers[0];
   if (type === 'ac') {
-    return [{ value: tier.ac.price, color: '#00C896', label: `AC ${fmt(tier.ac.price)}` }];
+    return [
+      { value: tier.ac.price,  color: '#00C896', label: `AC ${fmt(tier.ac.price)}` },
+      { value: tier.dc.enbw,   color: '#F97316', label: `EnBW ${fmt(tier.dc.enbw)}` },
+    ];
   }
   return [
     { value: tier.dc.spn,     color: provider.id === 'elli-control' ? '#EC4899' : '#C026D3', label: `SPN ${fmt(tier.dc.spn)}` },
@@ -67,10 +70,6 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
 
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ textAlign: 'center', fontSize: 13, color: theme.textMuted, marginBottom: 20, fontWeight: 500, letterSpacing: '0.02em' }}>
-        {type === 'ac' ? 'AC' : 'DC'}-price corridors (benchmark)
-      </div>
-
       <div style={{ display: 'flex' }}>
         {/* Labels column */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
@@ -154,14 +153,14 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                 }} />
                 {markers.map((m, mi) => (
                   <div key={mi}>
-                    {/* Upward triangle */}
-                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid - 7, transform: 'translateX(-50%)', zIndex: 3 }}>
+                    {/* Triangle marker — tip up (▲), centered on mid so dotted line meets the tip */}
+                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid - 5, transform: 'translateX(-50%)', zIndex: 3 }}>
                       <svg width={12} height={10} viewBox="0 0 12 10">
-                        <polygon points="6,10 0,0 12,0" fill={m.color} />
+                        <polygon points="6,0 0,10 12,10" fill={m.color} />
                       </svg>
                     </div>
                     {/* Value label */}
-                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid + 5, transform: 'translateX(-50%)', fontSize: 10, color: m.color, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
+                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid + 7, transform: 'translateX(-50%)', fontSize: 10, color: m.color, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
                       {fmt(m.value)}
                     </div>
                   </div>
@@ -214,6 +213,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
             {line.label}
           </div>
         ))}
+        <div style={{ marginLeft: 'auto', fontStyle: 'italic', opacity: 0.6 }}>All values in €/kWh</div>
       </div>
     </div>
   );

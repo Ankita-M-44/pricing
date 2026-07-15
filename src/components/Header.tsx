@@ -45,8 +45,6 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme }: Pr
         }}>
           <Clock size={12} />
           <span>Updated: {formatted}</span>
-          <span style={{ opacity: 0.4 }}>·</span>
-          <span>All values in €/kWh</span>
         </div>
 
         {/* Theme toggle */}
