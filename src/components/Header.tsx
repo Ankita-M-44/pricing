@@ -1,4 +1,5 @@
 import { Clock, Sun, Moon } from 'lucide-react';
+import ElliLogo from './ElliLogo';
 import type { Theme } from '../theme';
 
 interface Props {
@@ -23,11 +24,9 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme }: Pr
       alignItems: 'center',
       justifyContent: 'space-between',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: theme.text, letterSpacing: '-0.5px' }}>
-          Elli<span style={{ color: '#00C896' }}>⚡</span>
-        </div>
-        <div style={{ width: 1, height: 20, background: theme.border }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <ElliLogo color={isDark ? '#FFFFFF' : '#7B2FBE'} height={34} />
+        <div style={{ width: 1, height: 28, background: theme.border }} />
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: theme.text }}>Pricing Signals Dashboard</div>
           <div style={{ fontSize: 12, color: '#00C896', fontWeight: 500 }}>Fleet Charging · Benchmark vs. Market</div>
