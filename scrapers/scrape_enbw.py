@@ -1,11 +1,12 @@
 """
 Scraper for EnBW mobility+ fleet tariffs.
-Target: https://www.enbw.com/elektromobilitaet/fuer-unternehmen/flottenloesungen/
-EnBW publishes tiered S/M/L pricing for fleet cards.
+Target: https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-s/ (and tarif-m, tarif-l)
+EnBW displays prices in ct/kWh (e.g. "42,86 ct/kWh") — must divide by 100.
+Tiers S/M/L each have an EnBW-station price and an "Andere Betreiber" (other operators) range.
 """
 import re
 from playwright.sync_api import sync_playwright
-from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
+from base_scraper import BaseScraper, TierPrice, PricePoint
 
 
 TIER_PAGES = {
@@ -14,12 +15,42 @@ TIER_PAGES = {
     "L": "https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-l/",
 }
 
-# Fallback values from last known good data (updated manually when site structure changes)
+# Fallback values — verified against EnBW site 2026-07-15
+# EnBW stations regular price = AC price; other operators range 47.06–74.79 ct/kWh
 FALLBACK = {
-    "S": TierPrice("S", PricePoint(0.47, 0.74, 0.60), PricePoint(0.47, 0.74, 0.62)),
-    "M": TierPrice("M", PricePoint(0.38, 0.74, 0.55), PricePoint(0.38, 0.74, 0.57)),
-    "L": TierPrice("L", PricePoint(0.32, 0.74, 0.48), PricePoint(0.32, 0.74, 0.50)),
+    "S": TierPrice("S", PricePoint(0.4286, 0.7479, 0.4706), PricePoint(0.4286, 0.7479, 0.4706)),
+    "M": TierPrice("M", PricePoint(0.3446, 0.7479, 0.3866), PricePoint(0.3446, 0.7479, 0.3866)),
+    "L": TierPrice("L", PricePoint(0.2857, 0.7479, 0.3277), PricePoint(0.2857, 0.7479, 0.3277)),
 }
+
+
+def _parse_ct_kwh(text: str) -> list[float]:
+    """Extract prices in ct/kWh and return as €/kWh (divided by 100)."""
+    prices = []
+    for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
+        raw = m.group(1).replace(',', '.')
+        try:
+            val = float(raw) / 100.0
+            if 0.10 < val < 1.50:
+                prices.append(round(val, 4))
+        except ValueError:
+            pass
+    return sorted(set(prices))
+
+
+def _parse_euro_kwh(text: str) -> list[float]:
+    """Extract prices already in €/kWh."""
+    prices = []
+    for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh']:
+        for m in re.finditer(pat, text, re.IGNORECASE):
+            raw = m.group(1).replace(',', '.')
+            try:
+                val = float(raw)
+                if 0.10 < val < 1.50:
+                    prices.append(round(val, 4))
+            except ValueError:
+                pass
+    return sorted(set(prices))
 
 
 class EnBWScraper(BaseScraper):
@@ -45,49 +76,46 @@ class EnBWScraper(BaseScraper):
                             pass
 
                     text = page.inner_text("body")
-                    print(f"EnBW {tier_name}: page text sample:\n{text[:600]}")
+                    print(f"EnBW {tier_name}: page text sample:\n{text[:800]}")
 
-                    ac_price = self._extract_price(text, "AC")
-                    dc_price = self._extract_price(text, "DC")
-                    print(f"EnBW {tier_name}: AC={ac_price}, DC={dc_price}")
+                    # Try ct/kWh first (EnBW's format), then fall back to €/kWh
+                    ct_prices = _parse_ct_kwh(text)
+                    euro_prices = _parse_euro_kwh(text)
+                    all_prices = ct_prices if ct_prices else euro_prices
 
-                    if ac_price and dc_price:
-                        results.append(TierPrice(
+                    print(f"EnBW {tier_name}: ct/kWh found={ct_prices}, €/kWh found={euro_prices}")
+
+                    if len(all_prices) >= 2:
+                        # EnBW station price (lowest) = regular tariff; max = other operators ceiling
+                        enbw_price = all_prices[0]
+                        other_max = all_prices[-1]
+                        fallback = FALLBACK[tier_name]
+                        result = TierPrice(
                             tier=tier_name,
-                            ac=PricePoint(FALLBACK[tier_name].ac.min, FALLBACK[tier_name].ac.max, ac_price),
-                            dc=PricePoint(FALLBACK[tier_name].dc.min, FALLBACK[tier_name].dc.max, dc_price),
-                        ))
+                            ac=PricePoint(enbw_price, other_max, enbw_price),
+                            dc=PricePoint(enbw_price, other_max, enbw_price),
+                        )
+                        results.append(result)
+                        print(f"EnBW {tier_name}: scraped → ac/dc enbw={enbw_price}, max={other_max}")
+                    elif len(all_prices) == 1:
+                        fallback = FALLBACK[tier_name]
+                        result = TierPrice(
+                            tier=tier_name,
+                            ac=PricePoint(all_prices[0], fallback.ac.max, all_prices[0]),
+                            dc=PricePoint(all_prices[0], fallback.dc.max, all_prices[0]),
+                        )
+                        results.append(result)
+                        print(f"EnBW {tier_name}: single price found={all_prices[0]}, using fallback max")
                     else:
-                        print(f"EnBW {tier_name}: could not parse prices, using fallback")
+                        print(f"EnBW {tier_name}: no prices found, using fallback")
                         results.append(FALLBACK[tier_name])
+
                 except Exception as e:
                     print(f"EnBW {tier_name} error: {e}, using fallback")
                     results.append(FALLBACK[tier_name])
 
             browser.close()
         return results
-
-    def _extract_price(self, text: str, charge_type: str) -> float | None:
-        lines = text.split('\n')
-        for i, line in enumerate(lines):
-            if charge_type in line:
-                context = ' '.join(lines[max(0, i-2):i+3])
-                for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh']:
-                    for m in re.finditer(pat, context, re.IGNORECASE):
-                        price = parse_euro(m.group(0))
-                        if price and 0.10 < price < 1.50:
-                            return price
-        # Fallback: find all kWh prices on the page
-        prices = []
-        for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh']:
-            for m in re.finditer(pat, text, re.IGNORECASE):
-                val = parse_euro(m.group(0))
-                if val and 0.10 < val < 1.50:
-                    prices.append(val)
-        if prices:
-            prices = sorted(set(prices))
-            return prices[0] if charge_type == "AC" else prices[-1]
-        return None
 
 
 if __name__ == "__main__":
