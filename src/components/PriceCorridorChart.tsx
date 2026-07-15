@@ -159,8 +159,8 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                         <polygon points="6,0 0,10 12,10" fill={m.color} />
                       </svg>
                     </div>
-                    {/* Value label */}
-                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid + 7, transform: 'translateX(-50%)', fontSize: 10, color: m.color, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
+                    {/* Value label — to the right of arrow */}
+                    <div style={{ position: 'absolute', left: `calc(${pct(m.value)}% + 8px)`, top: mid - 5, fontSize: 10, color: m.color, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
                       {fmt(m.value)}
                     </div>
                   </div>
