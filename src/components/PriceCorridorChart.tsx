@@ -18,7 +18,7 @@ function pct(value: number): number {
 }
 
 function fmt(v: number): string {
-  return `€ ${v.toFixed(2).replace('.', ',')}`;
+  return `€ ${v.toFixed(4).replace('.', ',')}`;
 }
 
 interface ElliMarker {
