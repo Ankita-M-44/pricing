@@ -34,26 +34,28 @@ class EnBWScraper(BaseScraper):
 
             for tier_name, url in TIER_PAGES.items():
                 try:
-                    page.goto(url, timeout=30000, wait_until="domcontentloaded")
-                    page.wait_for_timeout(2000)
+                    page.goto(url, timeout=40000, wait_until="networkidle")
+                    for sel in ["#onetrust-accept-btn-handler", "button[class*='accept']",
+                                "button[class*='cookie']"]:
+                        try:
+                            page.click(sel, timeout=2000)
+                            page.wait_for_timeout(800)
+                            break
+                        except Exception:
+                            pass
 
-                    content = page.content()
-                    ac_price = self._extract_price(content, "AC")
-                    dc_price = self._extract_price(content, "DC")
+                    text = page.inner_text("body")
+                    print(f"EnBW {tier_name}: page text sample:\n{text[:600]}")
+
+                    ac_price = self._extract_price(text, "AC")
+                    dc_price = self._extract_price(text, "DC")
+                    print(f"EnBW {tier_name}: AC={ac_price}, DC={dc_price}")
 
                     if ac_price and dc_price:
                         results.append(TierPrice(
                             tier=tier_name,
-                            ac=PricePoint(
-                                min=FALLBACK[tier_name].ac.min,
-                                max=FALLBACK[tier_name].ac.max,
-                                current=ac_price,
-                            ),
-                            dc=PricePoint(
-                                min=FALLBACK[tier_name].dc.min,
-                                max=FALLBACK[tier_name].dc.max,
-                                current=dc_price,
-                            ),
+                            ac=PricePoint(FALLBACK[tier_name].ac.min, FALLBACK[tier_name].ac.max, ac_price),
+                            dc=PricePoint(FALLBACK[tier_name].dc.min, FALLBACK[tier_name].dc.max, dc_price),
                         ))
                     else:
                         print(f"EnBW {tier_name}: could not parse prices, using fallback")
@@ -65,17 +67,26 @@ class EnBWScraper(BaseScraper):
             browser.close()
         return results
 
-    def _extract_price(self, html: str, charge_type: str) -> float | None:
-        # Look for patterns like "0,59 €/kWh" near AC/DC labels
-        # EnBW pages typically have a pricing table
-        lines = html.split('\n')
+    def _extract_price(self, text: str, charge_type: str) -> float | None:
+        lines = text.split('\n')
         for i, line in enumerate(lines):
             if charge_type in line:
-                # Check surrounding lines for a price
                 context = ' '.join(lines[max(0, i-2):i+3])
-                price = parse_euro(context)
-                if price and 0.10 < price < 1.50:
-                    return price
+                for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh']:
+                    for m in re.finditer(pat, context, re.IGNORECASE):
+                        price = parse_euro(m.group(0))
+                        if price and 0.10 < price < 1.50:
+                            return price
+        # Fallback: find all kWh prices on the page
+        prices = []
+        for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh']:
+            for m in re.finditer(pat, text, re.IGNORECASE):
+                val = parse_euro(m.group(0))
+                if val and 0.10 < val < 1.50:
+                    prices.append(val)
+        if prices:
+            prices = sorted(set(prices))
+            return prices[0] if charge_type == "AC" else prices[-1]
         return None
 
 

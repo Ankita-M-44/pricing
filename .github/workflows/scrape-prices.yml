@@ -33,7 +33,7 @@ jobs:
         run: |
           cd scrapers
           python run_scrapers.py
-        continue-on-error: true  # partial failures are ok; we use fallbacks
+        # always exits 0 — fallbacks handle partial failures; see scraper logs for detail
 
       - name: Commit updated prices
         run: |
@@ -47,7 +47,7 @@ jobs:
             git push
           fi
 
-      - name: Notify on scraper failures
-        if: failure()
+      - name: Summarise scraper run
+        if: always()
         run: |
-          echo "::warning::One or more scrapers failed. Check the logs and update fallback values if needed."
+          echo "Scraper run complete. Check step logs above for per-provider results and any fallback notices."

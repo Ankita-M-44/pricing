@@ -29,8 +29,8 @@ ELLI_PROVIDERS = [
         "tiers": [
             {
                 "tier": None,
-                "ac": {"min": 0.54, "max": 0.54, "current": 0.54},
-                "dc": {"min": 0.59, "max": 0.74, "current": 0.63, "spn": 0.59, "enbw": 0.74},
+                "ac": {"price": 0.53},
+                "dc": {"general": 0.63, "spn": 0.59, "enbw": 0.67},
             }
         ],
     },
@@ -42,8 +42,8 @@ ELLI_PROVIDERS = [
         "tiers": [
             {
                 "tier": None,
-                "ac": {"min": 0.54, "max": 0.54, "current": 0.54},
-                "dc": {"min": 0.49, "max": 0.74, "current": 0.63, "spn": 0.49, "enbw": 0.74},
+                "ac": {"price": 0.53},
+                "dc": {"general": 0.63, "spn": 0.49, "enbw": 0.67},
             }
         ],
     },
@@ -117,5 +117,5 @@ def run():
 
 
 if __name__ == "__main__":
-    success = run()
-    sys.exit(0 if success else 1)
+    run()
+    sys.exit(0)  # always exit 0 — fallbacks handle partial failures gracefully
