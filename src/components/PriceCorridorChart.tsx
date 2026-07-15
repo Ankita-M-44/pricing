@@ -1,14 +1,16 @@
 import type { CompetitorProvider, ElliProvider, ChargingType } from '../types';
+import type { Theme } from '../theme';
 
 interface Props {
   competitors: CompetitorProvider[];
   elliProviders: ElliProvider[];
   type: ChargingType;
+  theme: Theme;
 }
 
 const CHART_MIN = 0.20;
 const CHART_MAX = 0.85;
-const LABEL_WIDTH = 110;
+const LABEL_WIDTH = 148;
 const ROW_H = 38;
 
 function pct(value: number): number {
@@ -37,7 +39,6 @@ function getElliMarkersForRow(provider: ElliProvider, type: ChargingType): ElliM
   ];
 }
 
-// All unique Elli overlay line values for drawing vertical lines through competitor rows
 function getAllElliLines(elliProviders: ElliProvider[], type: ChargingType) {
   const seen = new Map<number, { color: string; label: string }>();
   for (const p of elliProviders) {
@@ -50,10 +51,9 @@ function getAllElliLines(elliProviders: ElliProvider[], type: ChargingType) {
 
 const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80];
 
-export default function PriceCorridorChart({ competitors, elliProviders, type }: Props) {
+export default function PriceCorridorChart({ competitors, elliProviders, type, theme }: Props) {
   const overlayLines = getAllElliLines(elliProviders, type);
 
-  // Flatten competitor tiers
   const rows: Array<{ label: string; provider: CompetitorProvider; tierIdx: number }> = [];
   for (const p of competitors) {
     p.tiers.forEach((_, i) => {
@@ -67,20 +67,20 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
 
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ textAlign: 'center', fontSize: 13, color: '#8B82B8', marginBottom: 20, fontWeight: 500, letterSpacing: '0.02em' }}>
+      <div style={{ textAlign: 'center', fontSize: 13, color: theme.textMuted, marginBottom: 20, fontWeight: 500, letterSpacing: '0.02em' }}>
         {type === 'ac' ? 'AC' : 'DC'}-price corridors (benchmark)
       </div>
 
       <div style={{ display: 'flex' }}>
-        {/* Row labels column */}
+        {/* Labels column */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
           {rows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 10, fontSize: 12, color: '#8B82B8' }}>
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
               {row.label}
             </div>
           ))}
           {elliProviders.map(p => (
-            <div key={p.id} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 10, fontSize: 12, color: '#C084FC', fontWeight: 600 }}>
+            <div key={p.id} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
               {p.name}
             </div>
           ))}
@@ -92,7 +92,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
           {ticks.map(t => (
             <div key={t} style={{
               position: 'absolute', left: `${pct(t)}%`, top: 0, bottom: 0,
-              width: 1, background: 'rgba(139, 130, 184, 0.1)', pointerEvents: 'none',
+              width: 1, background: theme.borderSubtle, pointerEvents: 'none',
             }} />
           ))}
 
@@ -105,12 +105,10 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
 
             return (
               <div key={row.label}>
-                {/* Min label */}
-                <div style={{ position: 'absolute', left: `${pct(pp.min)}%`, top: top + 4, fontSize: 10, color: '#8B82B8', transform: 'translateX(-100%) translateX(-3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
+                <div style={{ position: 'absolute', left: `${pct(pp.min)}%`, top: top + 4, fontSize: 10, color: theme.textMuted, transform: 'translateX(-100%) translateX(-3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   {fmt(pp.min)}
                 </div>
-                {/* Max label */}
-                <div style={{ position: 'absolute', left: `${pct(pp.max)}%`, top: top + 4, fontSize: 10, color: '#8B82B8', transform: 'translateX(3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
+                <div style={{ position: 'absolute', left: `${pct(pp.max)}%`, top: top + 4, fontSize: 10, color: theme.textMuted, transform: 'translateX(3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   {fmt(pp.max)}
                 </div>
                 {/* Range bar */}
@@ -120,10 +118,10 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
                   width: `${pct(pp.max) - pct(pp.min)}%`,
                   top: mid - 4,
                   height: 8,
-                  background: 'rgba(139, 130, 184, 0.25)',
+                  background: theme.chartBar,
                   borderRadius: 4,
                 }} />
-                {/* Median circle — same vertical center as bar */}
+                {/* Median circle — same vertical center as bar (mid - 5 to mid + 5) */}
                 <div style={{
                   position: 'absolute',
                   left: `${pct(pp.median)}%`,
@@ -132,7 +130,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
                   height: 10,
                   borderRadius: '50%',
                   background: '#00C896',
-                  border: '2px solid #0D0A2E',
+                  border: `2px solid ${theme.bg}`,
                   transform: 'translateX(-50%)',
                   zIndex: 2,
                 }} />
@@ -140,7 +138,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
             );
           })}
 
-          {/* Elli rows — purple highlighted, markers per price point */}
+          {/* Elli rows */}
           {elliProviders.map((p, ei) => {
             const top = competitorHeight + ei * ROW_H;
             const mid = top + ROW_H / 2;
@@ -148,35 +146,22 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
 
             return (
               <div key={p.id}>
-                {/* Row background */}
                 <div style={{
-                  position: 'absolute', left: 0, right: 0,
-                  top, height: ROW_H,
-                  background: 'rgba(123, 47, 190, 0.12)',
-                  borderTop: ei === 0 ? '1px solid rgba(123, 47, 190, 0.3)' : '1px solid rgba(123, 47, 190, 0.15)',
+                  position: 'absolute', left: 0, right: 0, top, height: ROW_H,
+                  background: 'rgba(123, 47, 190, 0.10)',
+                  borderTop: ei === 0 ? '1px solid rgba(123, 47, 190, 0.3)' : '1px solid rgba(123, 47, 190, 0.12)',
                   borderBottom: ei === elliProviders.length - 1 ? '1px solid rgba(123, 47, 190, 0.3)' : 'none',
                 }} />
-                {/* Markers */}
                 {markers.map((m, mi) => (
                   <div key={mi}>
-                    {/* Upward triangle marker */}
-                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid - 8, transform: 'translateX(-50%)', zIndex: 3 }}>
+                    {/* Upward triangle */}
+                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid - 7, transform: 'translateX(-50%)', zIndex: 3 }}>
                       <svg width={12} height={10} viewBox="0 0 12 10">
                         <polygon points="6,10 0,0 12,0" fill={m.color} />
                       </svg>
                     </div>
-                    {/* Value label below triangle */}
-                    <div style={{
-                      position: 'absolute',
-                      left: `${pct(m.value)}%`,
-                      top: mid + 4,
-                      transform: 'translateX(-50%)',
-                      fontSize: 10,
-                      color: m.color,
-                      whiteSpace: 'nowrap',
-                      fontWeight: 600,
-                      zIndex: 3,
-                    }}>
+                    {/* Value label */}
+                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid + 5, transform: 'translateX(-50%)', fontSize: 10, color: m.color, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
                       {fmt(m.value)}
                     </div>
                   </div>
@@ -185,16 +170,16 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
             );
           })}
 
-          {/* Elli vertical overlay lines — run through competitor rows only */}
+          {/* Elli overlay lines — extend full height through competitor AND Elli rows */}
           {overlayLines.map((line, i) => (
             <div key={i} style={{
               position: 'absolute',
               left: `${pct(line.value)}%`,
               top: 0,
-              height: competitorHeight,
+              height: totalHeight,
               width: 0,
               borderLeft: `2px dashed ${line.color}`,
-              opacity: 0.7,
+              opacity: 0.75,
               zIndex: 1,
               pointerEvents: 'none',
             }} />
@@ -202,12 +187,12 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
         </div>
       </div>
 
-      {/* X-axis ticks */}
+      {/* X-axis */}
       <div style={{ display: 'flex', marginTop: 8 }}>
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }} />
         <div style={{ flex: 1, position: 'relative', height: 18 }}>
           {ticks.map(t => (
-            <div key={t} style={{ position: 'absolute', left: `${pct(t)}%`, fontSize: 10, color: '#8B82B8', transform: 'translateX(-50%)' }}>
+            <div key={t} style={{ position: 'absolute', left: `${pct(t)}%`, fontSize: 10, color: theme.textMuted, transform: 'translateX(-50%)' }}>
               {fmt(t)}
             </div>
           ))}
@@ -215,15 +200,17 @@ export default function PriceCorridorChart({ competitors, elliProviders, type }:
       </div>
 
       {/* Legend */}
-      <div style={{ marginTop: 16, marginLeft: LABEL_WIDTH, display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 11, color: '#8B82B8', alignItems: 'center' }}>
+      <div style={{ marginTop: 16, marginLeft: LABEL_WIDTH, display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 11, color: theme.textMuted, alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 24, height: 6, background: 'rgba(139, 130, 184, 0.35)', borderRadius: 3 }} />
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C896', border: '2px solid #0D0A2E', flexShrink: 0 }} />
+          <div style={{ width: 24, height: 6, background: theme.chartBar, borderRadius: 3 }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C896', border: `2px solid ${theme.bg}`, flexShrink: 0 }} />
           Competitor corridor · median
         </div>
         {overlayLines.map((line, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width={10} height={8} viewBox="0 0 12 10"><polygon points="6,10 0,0 12,0" fill={line.color} /></svg>
+            <svg width={20} height={10} viewBox="0 0 20 10">
+              <line x1="0" y1="5" x2="20" y2="5" stroke={line.color} strokeWidth="2" strokeDasharray="5,3" />
+            </svg>
             {line.label}
           </div>
         ))}
