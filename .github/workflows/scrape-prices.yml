@@ -1,11 +1,11 @@
 name: Scrape Competitor Prices
 
 on:
-  # PAUSED: re-add the schedule block below when ready to activate
+  # PAUSED: uncomment to activate bi-weekly scraping (1st and 15th of each month)
   # schedule:
-  #   - cron: '0 6 * * *'
+  #   - cron: '0 6 1,15 * *'
   workflow_dispatch:
-    # Manual trigger only — run from GitHub Actions UI when needed
+    # Manual trigger — run from GitHub Actions UI when needed
 
 jobs:
   scrape:

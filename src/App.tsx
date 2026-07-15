@@ -3,7 +3,7 @@ import Header from './components/Header';
 import PriceCorridorChart from './components/PriceCorridorChart';
 import ElliPricingCard from './components/ElliPricingCard';
 import PriceChangeAlert from './components/PriceChangeAlert';
-import type { PricesData, ChargingType } from './types';
+import type { PricesData, ChargingType, CompetitorProvider, ElliProvider } from './types';
 import './index.css';
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -61,10 +61,10 @@ export default function App() {
     );
   }
 
-  const competitors = data.providers.filter(p => !p.isElli);
-  const elliProviders = data.providers.filter(p => p.isElli);
-  const allForChart = [...competitors, ...elliProviders];
+  const competitors = data.providers.filter((p): p is CompetitorProvider => !p.isElli);
+  const elliProviders = data.providers.filter((p): p is ElliProvider => p.isElli);
 
+  // Detect recent price changes from history
   const recentChanges: Array<{ provider: string; type: 'ac' | 'dc'; oldPrice: number; newPrice: number; date: string }> = [];
   if (data.history.length >= 2) {
     const latest = data.history[data.history.length - 1];
@@ -74,23 +74,23 @@ export default function App() {
       for (const lp of latest.providers) {
         const pp = prev.providers.find(p => p.id === lp.id);
         if (!pp) continue;
-        const lacCur = lp.tiers[0]?.ac?.current;
-        const pacCur = pp.tiers[0]?.ac?.current;
-        if (lacCur !== pacCur && lacCur != null && pacCur != null) {
-          recentChanges.push({ provider: lp.name, type: 'ac', oldPrice: pacCur, newPrice: lacCur, date: latest.date });
+        const lAc = lp.tiers[0]?.ac?.median;
+        const pAc = pp.tiers[0]?.ac?.median;
+        if (lAc !== pAc && lAc != null && pAc != null) {
+          recentChanges.push({ provider: lp.name, type: 'ac', oldPrice: pAc, newPrice: lAc, date: latest.date });
         }
-        const ldcCur = lp.tiers[0]?.dc?.current;
-        const pdcCur = pp.tiers[0]?.dc?.current;
-        if (ldcCur !== pdcCur && ldcCur != null && pdcCur != null) {
-          recentChanges.push({ provider: lp.name, type: 'dc', oldPrice: pdcCur, newPrice: ldcCur, date: latest.date });
+        const lDc = lp.tiers[0]?.dc?.median;
+        const pDc = pp.tiers[0]?.dc?.median;
+        if (lDc !== pDc && lDc != null && pDc != null) {
+          recentChanges.push({ provider: lp.name, type: 'dc', oldPrice: pDc, newPrice: lDc, date: latest.date });
         }
       }
     }
   }
 
-  const updatedAt = new Date(data.lastUpdated).getTime();
-  const ageMs = Date.now() - updatedAt;
-  const scraperStatus: 'ok' | 'stale' | 'error' = ageMs < 2 * 86400 * 1000 ? 'ok' : ageMs < 7 * 86400 * 1000 ? 'stale' : 'error';
+  const ageMs = Date.now() - new Date(data.lastUpdated).getTime();
+  const scraperStatus: 'ok' | 'stale' | 'error' =
+    ageMs < 2 * 86400 * 1000 ? 'ok' : ageMs < 16 * 86400 * 1000 ? 'stale' : 'error';
   const scraperTargets = ['EnBW', 'Shell', 'DKV', 'UTA', 'Aral pulse'];
 
   return (
@@ -107,24 +107,26 @@ export default function App() {
             Elli Fleet Pricing (Current)
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            {elliProviders.map(p => (
-              <ElliPricingCard key={p.id} provider={p} />
-            ))}
+            {/* Flex card (static) */}
             <div style={{
               background: '#1A1550',
               border: '1px solid rgba(123, 47, 190, 0.2)',
               borderRadius: 12,
               padding: '20px 24px',
-              minWidth: 180,
-              opacity: 0.6,
+              minWidth: 200,
+              opacity: 0.7,
             }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#F0EEFF', marginBottom: 4 }}>Elli – Flex</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#A855F7', marginBottom: 12 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#F0EEFF', marginBottom: 2 }}>Elli – Flex</div>
+              <div style={{ fontSize: 12, color: '#00C896', marginBottom: 10 }}>Ideal for occasional charging</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#A855F7', marginBottom: 10 }}>
                 € 3,50
                 <span style={{ fontSize: 12, fontWeight: 400, color: '#8B82B8', marginLeft: 4 }}>/ card / mo</span>
               </div>
               <div style={{ fontSize: 12, color: '#8B82B8' }}>Variable pass-through pricing</div>
             </div>
+            {elliProviders.map(p => (
+              <ElliPricingCard key={p.id} provider={p} />
+            ))}
           </div>
         </div>
 
@@ -133,10 +135,10 @@ export default function App() {
           background: '#1A1550',
           borderRadius: 14,
           border: '1px solid rgba(123, 47, 190, 0.25)',
-          padding: '28px 32px',
+          padding: '36px 32px 28px',
           marginBottom: 24,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#F0EEFF' }}>
                 Price Corridor Benchmark
@@ -145,7 +147,6 @@ export default function App() {
                 Side-by-side comparison vs. leading providers in AC & DC charging
               </div>
             </div>
-
             <div style={{
               display: 'flex',
               background: 'rgba(13, 10, 46, 0.6)',
@@ -158,7 +159,7 @@ export default function App() {
             </div>
           </div>
 
-          <PriceCorridorChart providers={allForChart} type={type} />
+          <PriceCorridorChart competitors={competitors} elliProviders={elliProviders} type={type} />
         </div>
 
         {/* Scraper status footer */}
@@ -182,7 +183,7 @@ export default function App() {
             ))}
           </div>
           <div style={{ fontSize: 11, color: '#8B82B8' }}>
-            Auto-updated daily via web scrapers · GitHub Actions
+            Auto-updated bi-weekly via web scrapers · GitHub Actions
           </div>
         </div>
       </div>

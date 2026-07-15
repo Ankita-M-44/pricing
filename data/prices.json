@@ -1,14 +1,14 @@
 {
-  "lastUpdated": "2026-06-30T00:00:00Z",
+  "lastUpdated": "2026-07-15T06:00:00Z",
   "providers": [
     {
       "id": "enbw",
       "name": "EnBW",
       "isElli": false,
       "tiers": [
-        { "tier": "S", "ac": { "min": 0.47, "max": 0.74, "current": 0.60 }, "dc": { "min": 0.47, "max": 0.74, "current": 0.62 } },
-        { "tier": "M", "ac": { "min": 0.38, "max": 0.74, "current": 0.55 }, "dc": { "min": 0.38, "max": 0.74, "current": 0.57 } },
-        { "tier": "L", "ac": { "min": 0.32, "max": 0.74, "current": 0.48 }, "dc": { "min": 0.32, "max": 0.74, "current": 0.50 } }
+        { "tier": "S", "ac": { "min": 0.47, "max": 0.74, "median": 0.60 }, "dc": { "min": 0.47, "max": 0.74, "median": 0.62 } },
+        { "tier": "M", "ac": { "min": 0.38, "max": 0.74, "median": 0.55 }, "dc": { "min": 0.38, "max": 0.74, "median": 0.57 } },
+        { "tier": "L", "ac": { "min": 0.32, "max": 0.74, "median": 0.48 }, "dc": { "min": 0.32, "max": 0.74, "median": 0.50 } }
       ]
     },
     {
@@ -16,7 +16,7 @@
       "name": "DKV",
       "isElli": false,
       "tiers": [
-        { "tier": null, "ac": { "min": 0.28, "max": 0.65, "current": 0.38 }, "dc": { "min": 0.52, "max": 0.69, "current": 0.58 } }
+        { "tier": null, "ac": { "min": 0.28, "max": 0.65, "median": 0.38 }, "dc": { "min": 0.52, "max": 0.69, "median": 0.58 } }
       ]
     },
     {
@@ -24,7 +24,7 @@
       "name": "UTA",
       "isElli": false,
       "tiers": [
-        { "tier": null, "ac": { "min": 0.28, "max": 0.69, "current": 0.42 }, "dc": { "min": 0.52, "max": 0.76, "current": 0.62 } }
+        { "tier": null, "ac": { "min": 0.28, "max": 0.69, "median": 0.42 }, "dc": { "min": 0.52, "max": 0.76, "median": 0.62 } }
       ]
     },
     {
@@ -32,7 +32,7 @@
       "name": "Shell",
       "isElli": false,
       "tiers": [
-        { "tier": null, "ac": { "min": 0.59, "max": 0.65, "current": 0.62 }, "dc": { "min": 0.59, "max": 0.65, "current": 0.61 } }
+        { "tier": null, "ac": { "min": 0.59, "max": 0.65, "median": 0.62 }, "dc": { "min": 0.59, "max": 0.65, "median": 0.61 } }
       ]
     },
     {
@@ -40,7 +40,7 @@
       "name": "Aral pulse",
       "isElli": false,
       "tiers": [
-        { "tier": null, "ac": { "min": 0.43, "max": 0.68, "current": 0.52 }, "dc": { "min": 0.49, "max": 0.72, "current": 0.57 } }
+        { "tier": null, "ac": { "min": 0.43, "max": 0.68, "median": 0.52 }, "dc": { "min": 0.49, "max": 0.72, "median": 0.57 } }
       ]
     },
     {
@@ -51,8 +51,8 @@
       "tiers": [
         {
           "tier": null,
-          "ac": { "min": 0.54, "max": 0.54, "current": 0.54 },
-          "dc": { "min": 0.59, "max": 0.74, "current": 0.63, "spn": 0.59, "enbw": 0.74 }
+          "ac": { "price": 0.53 },
+          "dc": { "general": 0.63, "spn": 0.59, "enbw": 0.67 }
         }
       ]
     },
@@ -64,8 +64,8 @@
       "tiers": [
         {
           "tier": null,
-          "ac": { "min": 0.54, "max": 0.54, "current": 0.54 },
-          "dc": { "min": 0.49, "max": 0.74, "current": 0.63, "spn": 0.49, "enbw": 0.74 }
+          "ac": { "price": 0.53 },
+          "dc": { "general": 0.63, "spn": 0.49, "enbw": 0.67 }
         }
       ]
     }

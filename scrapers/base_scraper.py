@@ -9,17 +9,10 @@ import re
 class PricePoint:
     min: float
     max: float
-    current: float
-    spn: Optional[float] = None
-    enbw: Optional[float] = None
+    median: float
 
     def to_dict(self):
-        d = {"min": self.min, "max": self.max, "current": self.current}
-        if self.spn is not None:
-            d["spn"] = self.spn
-        if self.enbw is not None:
-            d["enbw"] = self.enbw
-        return d
+        return {"min": self.min, "max": self.max, "median": self.median}
 
 
 @dataclass
