@@ -10,7 +10,7 @@ interface Props {
 
 const CHART_MAX = 0.16; // €/min — 16 ct/min ceiling
 const LABEL_WIDTH = 148;
-const ROW_H = 48;
+const ROW_H = 56;
 
 function pct(value: number): number {
   return (value / CHART_MAX) * 100;
@@ -128,18 +128,26 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     }}>no cap</div>}
                   </>
                 ) : (
-                  <div style={{
-                    position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
-                    fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
-                  }}>
-                    {fmtRate(fee.rate)}
-                    {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
-                  </div>
+                  <>
+                    <div style={{
+                      position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
+                      fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
+                    }}>
+                      {fmtRate(fee.rate)}
+                    </div>
+                    {fee.cap != null && <div style={{
+                      position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
+                      fontSize: 10, color: theme.textMuted, fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
+                    }}>max € {fee.cap.toFixed(2).replace('.', ',')}</div>}
+                    {fee.cap == null && fee.rate > 0 && <div style={{
+                      position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
+                      fontSize: 9, color: '#A83232', fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
+                    }}>no cap</div>}
+                  </>
                 )}
-                {/* Note — below bar to avoid overlap with grace label */}
+                {/* Note — below rate label to avoid overlap */}
                 {fee.note && (
-                  <div style={{ position: 'absolute', left: 4, top: mid + 6, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
+                  <div style={{ position: 'absolute', left: 4, top: mid + 20, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
                     {fee.note}
                   </div>
                 )}
