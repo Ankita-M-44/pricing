@@ -111,14 +111,22 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                 </div>
                 {/* Rate label — flipped left when bar is wide to avoid overflow */}
                 {labelRight ? (
-                  <div style={{
-                    position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid - 5,
-                    fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3, textAlign: 'right',
-                  }}>
-                    {fmtRate(fee.rate)}
-                    {fee.cap != null && <div style={{ color: theme.textMuted, fontWeight: 400, fontSize: 10 }}>max € {fee.cap.toFixed(2).replace('.', ',')}</div>}
-                    {fee.cap == null && fee.rate > 0 && <div style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}>no cap</div>}
-                  </div>
+                  <>
+                    <div style={{
+                      position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid - 16,
+                      fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3, textAlign: 'right',
+                    }}>
+                      {fmtRate(fee.rate)}
+                    </div>
+                    {fee.cap != null && <div style={{
+                      position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
+                      fontSize: 10, color: theme.textMuted, fontWeight: 400, zIndex: 3, textAlign: 'right',
+                    }}>max € {fee.cap.toFixed(2).replace('.', ',')}</div>}
+                    {fee.cap == null && fee.rate > 0 && <div style={{
+                      position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
+                      fontSize: 9, color: '#A83232', fontWeight: 400, zIndex: 3, textAlign: 'right',
+                    }}>no cap</div>}
+                  </>
                 ) : (
                   <div style={{
                     position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
