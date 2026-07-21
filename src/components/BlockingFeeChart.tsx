@@ -10,7 +10,7 @@ interface Props {
 
 const CHART_MAX = 0.16; // €/min — 16 ct/min ceiling
 const LABEL_WIDTH = 148;
-const ROW_H = 44; // slightly taller for grace period annotation
+const ROW_H = 48;
 
 function pct(value: number): number {
   return (value / CHART_MAX) * 100;
@@ -83,20 +83,15 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
             }
 
             const barWidth = pct(fee.rate);
-            const barColor = fee.rate >= 0.13 ? '#EF4444' : fee.rate >= 0.10 ? '#F59E0B' : '#8B82B8';
+            const barColor = fee.rate >= 0.13 ? '#A83232' : fee.rate >= 0.10 ? '#A07010' : '#6E6890';
 
+            const labelRight = barWidth > 78;
             return (
               <div key={row.label}>
-                {/* Grace period label */}
-                <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
+                {/* Grace period label — above bar */}
+                <div style={{ position: 'absolute', left: 4, top: top + 5, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
                   {fmtGrace(fee.graceMins)}
                 </div>
-                {/* Note (e.g. DKV day/night) */}
-                {fee.note && (
-                  <div style={{ position: 'absolute', left: 4, top: top + 16, fontSize: 9, color: theme.textMuted, opacity: 0.7 }}>
-                    {fee.note}
-                  </div>
-                )}
                 {/* Bar */}
                 <div style={{
                   position: 'absolute',
@@ -106,7 +101,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                   height: 8,
                   background: barColor,
                   borderRadius: 4,
-                  opacity: 0.75,
+                  opacity: 0.8,
                 }} />
                 {/* Triangle marker at rate */}
                 <div style={{ position: 'absolute', left: `${barWidth}%`, top: mid - 5, transform: 'translateX(-50%)', zIndex: 3 }}>
@@ -114,12 +109,24 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     <polygon points="6,0 0,10 12,10" fill={barColor} />
                   </svg>
                 </div>
-                {/* Rate label to the right */}
-                <div style={{ position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5, fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
+                {/* Rate label — flipped left when bar is wide to avoid overflow */}
+                <div style={{
+                  position: 'absolute',
+                  ...(labelRight
+                    ? { right: `calc(${100 - barWidth}% + 14px)`, textAlign: 'right' }
+                    : { left: `calc(${barWidth}% + 8px)` }),
+                  top: mid - 5, fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
+                }}>
                   {fmtRate(fee.rate)}
                   {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                  {fee.cap == null && fee.rate > 0 && <span style={{ color: '#EF4444', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
+                  {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
                 </div>
+                {/* Note — below bar to avoid overlap with grace label */}
+                {fee.note && (
+                  <div style={{ position: 'absolute', left: 4, top: mid + 6, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
+                    {fee.note}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -183,15 +190,15 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
       {/* Legend */}
       <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#8B82B8', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#6E6890', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Competitor · moderate</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#F59E0B', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#A07010', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Competitor · high</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#EF4444', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#A83232', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Competitor · very high / uncapped</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
