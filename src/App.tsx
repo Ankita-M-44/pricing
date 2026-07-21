@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import PriceCorridorChart from './components/PriceCorridorChart';
+import BlockingFeeChart from './components/BlockingFeeChart';
 import ElliPricingCard from './components/ElliPricingCard';
 import PriceChangeAlert from './components/PriceChangeAlert';
 import type { PricesData, ChargingType, CompetitorProvider, ElliProvider } from './types';
@@ -36,6 +37,7 @@ function ScraperBadge({ provider, status, theme }: { provider: string; status: '
 export default function App() {
   const [data, setData] = useState<PricesData | null>(null);
   const [type, setType] = useState<ChargingType>('ac');
+  const [blockingSubType, setBlockingSubType] = useState<'ac' | 'dc'>('ac');
   const [isDark, setIsDark] = useState(true);
 
   const theme = isDark ? dark : light;
@@ -111,9 +113,20 @@ export default function App() {
             <div style={{ display: 'flex', background: theme.inputBg, borderRadius: 24, padding: 4, border: `1px solid ${theme.borderSubtle}` }}>
               <TabButton active={type === 'ac'} onClick={() => setType('ac')} theme={theme}>AC</TabButton>
               <TabButton active={type === 'dc'} onClick={() => setType('dc')} theme={theme}>DC</TabButton>
+              <TabButton active={type === 'blocking'} onClick={() => setType('blocking')} theme={theme}>Blocking Fees</TabButton>
             </div>
           </div>
-          <PriceCorridorChart competitors={competitors} elliProviders={elliProviders} type={type} theme={theme} />
+          {type === 'blocking' ? (
+            <>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+                <button onClick={() => setBlockingSubType('ac')} style={{ padding: '4px 16px', borderRadius: 16, border: `1px solid ${theme.border}`, background: blockingSubType === 'ac' ? theme.border : 'transparent', color: blockingSubType === 'ac' ? theme.text : theme.textMuted, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>AC</button>
+                <button onClick={() => setBlockingSubType('dc')} style={{ padding: '4px 16px', borderRadius: 16, border: `1px solid ${theme.border}`, background: blockingSubType === 'dc' ? theme.border : 'transparent', color: blockingSubType === 'dc' ? theme.text : theme.textMuted, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>DC</button>
+              </div>
+              <BlockingFeeChart competitors={competitors} elliProviders={elliProviders} type={blockingSubType} theme={theme} />
+            </>
+          ) : (
+            <PriceCorridorChart competitors={competitors} elliProviders={elliProviders} type={type} theme={theme} />
+          )}
         </div>
 
         {/* Scraper status footer */}

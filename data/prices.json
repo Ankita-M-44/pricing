@@ -5,6 +5,10 @@
       "id": "enbw",
       "name": "EnBW",
       "isElli": false,
+      "blockingFees": {
+        "ac": { "rate": 0.084, "graceMins": 240, "cap": 10.08 },
+        "dc": { "rate": 0.084, "graceMins": 240, "cap": 10.08 }
+      },
       "tiers": [
         {
           "tier": "S",
@@ -51,6 +55,10 @@
       "id": "dkv",
       "name": "DKV",
       "isElli": false,
+      "blockingFees": {
+        "ac": { "rate": 0.09, "graceMins": 210, "note": "Daytime (06–18h) · night rate 0,02 €/min" },
+        "dc": { "rate": 0.12, "graceMins": 45 }
+      },
       "tiers": [
         {
           "tier": null,
@@ -71,6 +79,10 @@
       "id": "uta",
       "name": "UTA",
       "isElli": false,
+      "blockingFees": {
+        "ac": { "rate": 0.10, "graceMins": 210 },
+        "dc": { "rate": 0.10, "graceMins": 60 }
+      },
       "tiers": [
         {
           "tier": null,
@@ -91,6 +103,10 @@
       "id": "shell",
       "name": "Shell",
       "isElli": false,
+      "blockingFees": {
+        "ac": { "rate": 0, "graceMins": 0, "exempt": true },
+        "dc": { "rate": 0.15, "graceMins": 60 }
+      },
       "tiers": [
         {
           "tier": null,
@@ -111,6 +127,10 @@
       "id": "aral",
       "name": "Aral pulse",
       "isElli": false,
+      "blockingFees": {
+        "ac": { "rate": 0.15, "graceMins": 120, "cap": 10.00, "note": "Roaming sessions only" },
+        "dc": { "rate": 0.15, "graceMins": 45, "cap": 10.00, "note": "Roaming sessions only" }
+      },
       "tiers": [
         {
           "tier": null,
@@ -129,6 +149,10 @@
     },
     {
       "id": "elli-control",
+      "blockingFees": {
+        "ac": { "rate": 0.06, "graceMins": 240 },
+        "dc": { "rate": 0.13, "graceMins": 60 }
+      },
       "name": "Elli \u2013 Control",
       "isElli": true,
       "monthlyFee": 6.0,
@@ -148,6 +172,10 @@
     },
     {
       "id": "elli-performance",
+      "blockingFees": {
+        "ac": { "rate": 0.06, "graceMins": 240 },
+        "dc": { "rate": 0.13, "graceMins": 60 }
+      },
       "name": "Elli \u2013 Performance",
       "isElli": true,
       "monthlyFee": 11.0,

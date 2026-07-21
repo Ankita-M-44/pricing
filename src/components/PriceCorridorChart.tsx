@@ -4,7 +4,7 @@ import type { Theme } from '../theme';
 interface Props {
   competitors: CompetitorProvider[];
   elliProviders: ElliProvider[];
-  type: ChargingType;
+  type: 'ac' | 'dc';
   theme: Theme;
 }
 

@@ -31,6 +31,7 @@ export interface CompetitorProvider {
   name: string;
   isElli: false;
   tiers: CompetitorTier[];
+  blockingFees?: BlockingFees;
 }
 
 export interface ElliProvider {
@@ -39,6 +40,7 @@ export interface ElliProvider {
   isElli: true;
   monthlyFee: number;
   tiers: ElliTier[];
+  blockingFees?: BlockingFees;
 }
 
 export type Provider = CompetitorProvider | ElliProvider;
@@ -49,4 +51,17 @@ export interface PricesData {
   history: Array<{ date: string; providers: CompetitorProvider[] }>;
 }
 
-export type ChargingType = 'ac' | 'dc';
+export type ChargingType = 'ac' | 'dc' | 'blocking';
+
+export interface BlockingFeePoint {
+  rate: number;       // €/min
+  graceMins: number;  // free window before fee starts
+  cap?: number;       // session cap in €, undefined = no cap
+  exempt?: boolean;   // true if charging type is fully exempt (e.g. Shell AC)
+  note?: string;      // e.g. day/night rate note
+}
+
+export interface BlockingFees {
+  ac: BlockingFeePoint;
+  dc: BlockingFeePoint;
+}
