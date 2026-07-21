@@ -110,17 +110,25 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                   </svg>
                 </div>
                 {/* Rate label — flipped left when bar is wide to avoid overflow */}
-                <div style={{
-                  position: 'absolute',
-                  ...(labelRight
-                    ? { right: `calc(${100 - barWidth}% + 14px)`, textAlign: 'right' }
-                    : { left: `calc(${barWidth}% + 8px)` }),
-                  top: mid - 5, fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
-                }}>
-                  {fmtRate(fee.rate)}
-                  {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                  {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
-                </div>
+                {labelRight ? (
+                  <div style={{
+                    position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid - 5,
+                    fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3, textAlign: 'right',
+                  }}>
+                    {fmtRate(fee.rate)}
+                    {fee.cap != null && <div style={{ color: theme.textMuted, fontWeight: 400, fontSize: 10 }}>max € {fee.cap.toFixed(2).replace('.', ',')}</div>}
+                    {fee.cap == null && fee.rate > 0 && <div style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}>no cap</div>}
+                  </div>
+                ) : (
+                  <div style={{
+                    position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
+                    fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
+                  }}>
+                    {fmtRate(fee.rate)}
+                    {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
+                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
+                  </div>
+                )}
                 {/* Note — below bar to avoid overlap with grace label */}
                 {fee.note && (
                   <div style={{ position: 'absolute', left: 4, top: mid + 6, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
