@@ -155,9 +155,9 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
                   </div>
                 )}
-                {/* Note — below bar to avoid overlap */}
+                {/* Note — just below bar */}
                 {fee.note && (
-                  <div style={{ position: 'absolute', left: 4, top: mid + 20, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
+                  <div style={{ position: 'absolute', left: 4, top: mid + 10, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
                     {fee.note}
                   </div>
                 )}
