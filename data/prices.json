@@ -6,8 +6,8 @@
       "name": "EnBW",
       "isElli": false,
       "blockingFees": {
-        "ac": { "rate": 0.10, "graceMins": 240, "cap": 12.00 },
-        "dc": { "rate": 0.10, "graceMins": 240, "cap": 12.00 }
+        "ac": { "rate": 0.10, "graceMins": 210, "cap": 12.00 },
+        "dc": { "rate": 0.12, "graceMins": 45, "cap": 12.00 }
       },
       "tiers": [
         {
@@ -81,7 +81,7 @@
       "isElli": false,
       "blockingFees": {
         "ac": { "rate": 0.10, "graceMins": 210 },
-        "dc": { "rate": 0.10, "graceMins": 60 }
+        "dc": { "rate": 0.12, "graceMins": 60 }
       },
       "tiers": [
         {
