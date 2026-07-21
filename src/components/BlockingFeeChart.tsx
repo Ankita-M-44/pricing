@@ -86,6 +86,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
             const barColor = fee.rate >= 0.13 ? '#A83232' : fee.rate >= 0.10 ? '#A07010' : '#6E6890';
 
             const labelRight = barWidth > 78;
+            const stackVertical = row.provider.name === 'Shell' || row.provider.name === 'Aral pulse';
             return (
               <div key={row.label}>
                 {/* Grace period label — above bar */}
@@ -127,7 +128,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                       fontSize: 9, color: '#A83232', fontWeight: 400, zIndex: 3, textAlign: 'right',
                     }}>no cap</div>}
                   </>
-                ) : (
+                ) : stackVertical ? (
                   <>
                     <div style={{
                       position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
@@ -144,8 +145,17 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                       fontSize: 9, color: '#A83232', fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
                     }}>no cap</div>}
                   </>
+                ) : (
+                  <div style={{
+                    position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
+                    fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
+                  }}>
+                    {fmtRate(fee.rate)}
+                    {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
+                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
+                  </div>
                 )}
-                {/* Note — below rate label to avoid overlap */}
+                {/* Note — below bar to avoid overlap */}
                 {fee.note && (
                   <div style={{ position: 'absolute', left: 4, top: mid + 20, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
                     {fee.note}
