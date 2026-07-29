@@ -1,11 +1,14 @@
 import type { CompetitorProvider, ElliProvider, ChargingType } from '../types';
 import type { Theme } from '../theme';
+import type { Lang } from '../i18n';
+import { t as tr } from '../i18n';
 
 interface Props {
   competitors: CompetitorProvider[];
   elliProviders: ElliProvider[];
   type: 'ac' | 'dc';
   theme: Theme;
+  lang: Lang;
 }
 
 const CHART_MIN = 0.20;
@@ -54,7 +57,7 @@ function getAllElliLines(elliProviders: ElliProvider[], type: ChargingType) {
 
 const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80];
 
-export default function PriceCorridorChart({ competitors, elliProviders, type, theme }: Props) {
+export default function PriceCorridorChart({ competitors, elliProviders, type, theme, lang }: Props) {
   const overlayLines = getAllElliLines(elliProviders, type);
 
   const rows: Array<{ label: string; provider: CompetitorProvider; tierIdx: number }> = [];
@@ -203,7 +206,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 24, height: 6, background: theme.chartBar, borderRadius: 3 }} />
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C896', border: `2px solid ${theme.bg}`, flexShrink: 0 }} />
-          Competitor corridor · median
+          {tr(lang, 'competitorCorridor')}
         </div>
         {overlayLines.map((line, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -213,7 +216,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
             {line.label}
           </div>
         ))}
-        <div style={{ marginLeft: 'auto', fontStyle: 'italic', opacity: 0.6 }}>All values in €/kWh</div>
+        <div style={{ marginLeft: 'auto', fontStyle: 'italic', opacity: 0.6 }}>{tr(lang, 'allValuesKwh')}</div>
       </div>
     </div>
   );

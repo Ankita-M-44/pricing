@@ -1,11 +1,14 @@
 import type { CompetitorProvider, ElliProvider, BlockingFeePoint } from '../types';
 import type { Theme } from '../theme';
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
 
 interface Props {
   competitors: CompetitorProvider[];
   elliProviders: ElliProvider[];
   type: 'ac' | 'dc';
   theme: Theme;
+  lang: Lang;
 }
 
 const CHART_MAX = 0.16; // €/min — 16 ct/min ceiling
@@ -20,14 +23,15 @@ function fmtRate(v: number): string {
   return `${(v * 100).toFixed(0)} ct/min`;
 }
 
-function fmtGrace(mins: number): string {
-  if (mins >= 60) return `after ${mins / 60}h`;
-  return `after ${mins} min`;
+function fmtGrace(mins: number, lang: Lang): string {
+  const after = t(lang, 'after');
+  if (mins >= 60) return `${after} ${mins / 60}h`;
+  return `${after} ${mins} min`;
 }
 
 const ticks = [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16];
 
-export default function BlockingFeeChart({ competitors, elliProviders, type, theme }: Props) {
+export default function BlockingFeeChart({ competitors, elliProviders, type, theme, lang }: Props) {
   const competitorRows = competitors
     .filter(p => p.blockingFees)
     .map(p => ({ provider: p, fee: p.blockingFees![type] as BlockingFeePoint, isElli: false, label: p.name }));
@@ -76,7 +80,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
               return (
                 <div key={row.label}>
                   <div style={{ position: 'absolute', left: 8, top: mid - 9, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
-                    AC charging exempt — no blocking fee
+                    {t(lang, 'acExempt')}
                   </div>
                 </div>
               );
@@ -91,7 +95,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
               <div key={row.label}>
                 {/* Grace period label — above bar */}
                 <div style={{ position: 'absolute', left: 4, top: top + 5, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
-                  {fmtGrace(fee.graceMins)}
+                  {fmtGrace(fee.graceMins, lang)}
                 </div>
                 {/* Bar */}
                 <div style={{
@@ -122,11 +126,11 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     {fee.cap != null && <div style={{
                       position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
                       fontSize: 10, color: theme.textMuted, fontWeight: 400, zIndex: 3, textAlign: 'right',
-                    }}>max € {fee.cap.toFixed(2).replace('.', ',')}</div>}
+                    }}>{t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</div>}
                     {fee.cap == null && fee.rate > 0 && <div style={{
                       position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
                       fontSize: 9, color: '#A83232', fontWeight: 400, zIndex: 3, textAlign: 'right',
-                    }}>no cap</div>}
+                    }}>{t(lang, 'noCap')}</div>}
                   </>
                 ) : stackVertical ? (
                   <>
@@ -139,11 +143,11 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     {fee.cap != null && <div style={{
                       position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
                       fontSize: 10, color: theme.textMuted, fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
-                    }}>max € {fee.cap.toFixed(2).replace('.', ',')}</div>}
+                    }}>{t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</div>}
                     {fee.cap == null && fee.rate > 0 && <div style={{
                       position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
                       fontSize: 9, color: '#A83232', fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
-                    }}>no cap</div>}
+                    }}>{t(lang, 'noCap')}</div>}
                   </>
                 ) : (
                   <div style={{
@@ -151,8 +155,8 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
                   }}>
                     {fmtRate(fee.rate)}
-                    {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · no cap</span>}
+                    {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · {t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</span>}
+                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · {t(lang, 'noCap')}</span>}
                   </div>
                 )}
                 {/* Note — just below bar */}
@@ -184,7 +188,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                 }} />
                 {/* Grace period label */}
                 <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: '#C084FC', fontStyle: 'italic' }}>
-                  {fmtGrace(fee.graceMins)}
+                  {fmtGrace(fee.graceMins, lang)}
                 </div>
                 {/* Filled bar */}
                 <div style={{
@@ -201,7 +205,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                 {/* Rate label */}
                 <div style={{ position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5, fontSize: 10, color: elliColor, whiteSpace: 'nowrap', fontWeight: 700, zIndex: 3 }}>
                   {fmtRate(fee.rate)}
-                  {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · max € {fee.cap.toFixed(2).replace('.', ',')}</span>}
+                  {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · {t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</span>}
                 </div>
               </div>
             );
@@ -225,22 +229,22 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
       <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 20, height: 3, background: '#6E6890', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, color: theme.textMuted }}>Competitor · moderate</span>
+          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorModerate')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 20, height: 3, background: '#A07010', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, color: theme.textMuted }}>Competitor · high</span>
+          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorHigh')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 20, height: 3, background: '#A83232', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, color: theme.textMuted }}>Competitor · very high / uncapped</span>
+          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorVeryHigh')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 20, height: 3, background: '#00C896', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Elli</span>
         </div>
         <div style={{ marginLeft: 'auto', fontSize: 11, color: theme.textMuted, fontStyle: 'italic', opacity: 0.6 }}>
-          All rates in €/min · bar starts at 0
+          {t(lang, 'allRatesMin')}
         </div>
       </div>
     </div>

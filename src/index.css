@@ -17,3 +17,11 @@ body {
 #root {
   width: 100%;
 }
+
+/* Print / PDF export */
+.print-only { display: none; }
+@media print {
+  .print-only { display: block; }
+  .no-print { display: none !important; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

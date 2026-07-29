@@ -32,6 +32,7 @@ export interface CompetitorProvider {
   isElli: false;
   tiers: CompetitorTier[];
   blockingFees?: BlockingFees;
+  baseFees?: BaseFeeEntry[];
 }
 
 export interface ElliProvider {
@@ -51,7 +52,13 @@ export interface PricesData {
   history: Array<{ date: string; providers: CompetitorProvider[] }>;
 }
 
-export type ChargingType = 'ac' | 'dc' | 'blocking';
+export type ChargingType = 'ac' | 'dc' | 'blocking' | 'base';
+
+export interface BaseFeeEntry {
+  tier: string | null;
+  amount: number;   // € / card / month
+  note?: string;
+}
 
 export interface BlockingFeePoint {
   rate: number;       // €/min

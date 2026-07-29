@@ -6,8 +6,16 @@
       "name": "EnBW",
       "isElli": false,
       "blockingFees": {
-        "ac": { "rate": 0.10, "graceMins": 240, "cap": 12.00 },
-        "dc": { "rate": 0.10, "graceMins": 240, "cap": 12.00 }
+        "ac": {
+          "rate": 0.1,
+          "graceMins": 240,
+          "cap": 12.0
+        },
+        "dc": {
+          "rate": 0.1,
+          "graceMins": 240,
+          "cap": 12.0
+        }
       },
       "tiers": [
         {
@@ -49,6 +57,20 @@
             "median": 0.3277
           }
         }
+      ],
+      "baseFees": [
+        {
+          "tier": "S",
+          "amount": 0.0
+        },
+        {
+          "tier": "M",
+          "amount": 5.99
+        },
+        {
+          "tier": "L",
+          "amount": 17.99
+        }
       ]
     },
     {
@@ -56,8 +78,15 @@
       "name": "DKV",
       "isElli": false,
       "blockingFees": {
-        "ac": { "rate": 0.10, "graceMins": 210, "note": "Daytime (06–18h) · night rate 0,02 €/min" },
-        "dc": { "rate": 0.10, "graceMins": 45 }
+        "ac": {
+          "rate": 0.1,
+          "graceMins": 210,
+          "note": "Daytime (06–18h) · night rate 0,02 €/min"
+        },
+        "dc": {
+          "rate": 0.1,
+          "graceMins": 45
+        }
       },
       "tiers": [
         {
@@ -73,6 +102,13 @@
             "median": 0.58
           }
         }
+      ],
+      "baseFees": [
+        {
+          "tier": null,
+          "amount": 1.5,
+          "note": "Card service fee"
+        }
       ]
     },
     {
@@ -80,8 +116,14 @@
       "name": "UTA",
       "isElli": false,
       "blockingFees": {
-        "ac": { "rate": 0.10, "graceMins": 210 },
-        "dc": { "rate": 0.12, "graceMins": 60 }
+        "ac": {
+          "rate": 0.1,
+          "graceMins": 210
+        },
+        "dc": {
+          "rate": 0.12,
+          "graceMins": 60
+        }
       },
       "tiers": [
         {
@@ -97,6 +139,13 @@
             "median": 0.62
           }
         }
+      ],
+      "baseFees": [
+        {
+          "tier": null,
+          "amount": 2.0,
+          "note": "Card service fee"
+        }
       ]
     },
     {
@@ -104,8 +153,15 @@
       "name": "Shell",
       "isElli": false,
       "blockingFees": {
-        "ac": { "rate": 0, "graceMins": 0, "exempt": true },
-        "dc": { "rate": 0.15, "graceMins": 60 }
+        "ac": {
+          "rate": 0,
+          "graceMins": 0,
+          "exempt": true
+        },
+        "dc": {
+          "rate": 0.15,
+          "graceMins": 60
+        }
       },
       "tiers": [
         {
@@ -121,6 +177,13 @@
             "median": 0.61
           }
         }
+      ],
+      "baseFees": [
+        {
+          "tier": null,
+          "amount": 1.75,
+          "note": "Shell Card fee"
+        }
       ]
     },
     {
@@ -128,8 +191,18 @@
       "name": "Aral pulse",
       "isElli": false,
       "blockingFees": {
-        "ac": { "rate": 0.15, "graceMins": 120, "cap": 10.00, "note": "Roaming sessions only" },
-        "dc": { "rate": 0.15, "graceMins": 45, "cap": 10.00, "note": "Roaming sessions only" }
+        "ac": {
+          "rate": 0.15,
+          "graceMins": 120,
+          "cap": 10.0,
+          "note": "Roaming sessions only"
+        },
+        "dc": {
+          "rate": 0.15,
+          "graceMins": 45,
+          "cap": 10.0,
+          "note": "Roaming sessions only"
+        }
       },
       "tiers": [
         {
@@ -145,15 +218,27 @@
             "median": 0.57
           }
         }
+      ],
+      "baseFees": [
+        {
+          "tier": null,
+          "amount": 0.0
+        }
       ]
     },
     {
       "id": "elli-control",
       "blockingFees": {
-        "ac": { "rate": 0.06, "graceMins": 240 },
-        "dc": { "rate": 0.13, "graceMins": 60 }
+        "ac": {
+          "rate": 0.06,
+          "graceMins": 240
+        },
+        "dc": {
+          "rate": 0.13,
+          "graceMins": 60
+        }
       },
-      "name": "Elli \u2013 Control",
+      "name": "Elli – Control",
       "isElli": true,
       "monthlyFee": 6.0,
       "tiers": [
@@ -173,10 +258,16 @@
     {
       "id": "elli-performance",
       "blockingFees": {
-        "ac": { "rate": 0.06, "graceMins": 240 },
-        "dc": { "rate": 0.13, "graceMins": 60 }
+        "ac": {
+          "rate": 0.06,
+          "graceMins": 240
+        },
+        "dc": {
+          "rate": 0.13,
+          "graceMins": 60
+        }
       },
-      "name": "Elli \u2013 Performance",
+      "name": "Elli – Performance",
       "isElli": true,
       "monthlyFee": 11.0,
       "tiers": [

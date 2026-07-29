@@ -1,18 +1,31 @@
-import { Clock, Sun, Moon } from 'lucide-react';
+import { Clock, Sun, Moon, FileDown } from 'lucide-react';
 import type { Theme } from '../theme';
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
 
 interface Props {
   lastUpdated: string;
   isDark: boolean;
   onToggleTheme: () => void;
   theme: Theme;
+  lang: Lang;
+  onToggleLang: () => void;
+  onExportPdf: () => void;
 }
 
-export default function Header({ lastUpdated, isDark, onToggleTheme, theme }: Props) {
+export default function Header({ lastUpdated, isDark, onToggleTheme, theme, lang, onToggleLang, onExportPdf }: Props) {
   const date = new Date(lastUpdated);
-  const formatted = date.toLocaleDateString('en-GB', {
+  const formatted = date.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB', {
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
+
+  const pillStyle: React.CSSProperties = {
+    display: 'flex', alignItems: 'center', gap: 6,
+    fontSize: 12, color: theme.textMuted,
+    background: isDark ? 'rgba(139,130,184,0.1)' : 'rgba(123,47,190,0.06)',
+    padding: '6px 12px', borderRadius: 20,
+    border: `1px solid ${theme.borderSubtle}`,
+  };
 
   return (
     <div style={{
@@ -44,18 +57,44 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme }: Pr
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="no-print">
         {/* Updated timestamp */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          fontSize: 12, color: theme.textMuted,
-          background: isDark ? 'rgba(139,130,184,0.1)' : 'rgba(123,47,190,0.06)',
-          padding: '6px 12px', borderRadius: 20,
-          border: `1px solid ${theme.borderSubtle}`,
-        }}>
+        <div style={pillStyle}>
           <Clock size={12} />
-          <span>Updated: {formatted}</span>
+          <span>{t(lang, 'lastUpdated')}: {formatted}</span>
         </div>
+
+        {/* Export PDF */}
+        <button
+          onClick={onExportPdf}
+          title={t(lang, 'exportPdf')}
+          style={{
+            ...pillStyle,
+            cursor: 'pointer',
+            fontWeight: 600,
+          }}
+        >
+          <FileDown size={13} />
+          <span>{t(lang, 'exportPdf')}</span>
+        </button>
+
+        {/* Language toggle */}
+        <button
+          onClick={onToggleLang}
+          title={lang === 'en' ? 'Auf Deutsch wechseln' : 'Switch to English'}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            height: 34, padding: '0 12px', borderRadius: 17,
+            border: `1px solid ${theme.border}`,
+            background: theme.surface2,
+            color: theme.text,
+            fontSize: 12, fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+        >
+          {lang === 'en' ? 'DE' : 'EN'}
+        </button>
 
         {/* Theme toggle */}
         <button

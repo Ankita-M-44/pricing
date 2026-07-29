@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import PriceCorridorChart from './components/PriceCorridorChart';
 import BlockingFeeChart from './components/BlockingFeeChart';
+import BaseFeeChart from './components/BaseFeeChart';
 import ElliPricingCard from './components/ElliPricingCard';
 import PriceChangeAlert from './components/PriceChangeAlert';
 import type { PricesData, ChargingType, CompetitorProvider, ElliProvider } from './types';
 import { dark, light } from './theme';
+import type { Lang } from './i18n';
+import { t } from './i18n';
 import './index.css';
 
 function TabButton({ active, onClick, children, theme }: { active: boolean; onClick: () => void; children: React.ReactNode; theme: typeof dark }) {
@@ -39,6 +42,7 @@ export default function App() {
   const [type, setType] = useState<ChargingType>('ac');
   const [blockingSubType, setBlockingSubType] = useState<'ac' | 'dc'>('ac');
   const [isDark, setIsDark] = useState(true);
+  const [lang, setLang] = useState<Lang>('en');
 
   const theme = isDark ? dark : light;
 
@@ -49,7 +53,7 @@ export default function App() {
   if (!data) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: theme.bg, color: theme.textMuted }}>
-        Loading pricing data...
+        {t(lang, 'loading')}
       </div>
     );
   }
@@ -80,7 +84,15 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.2s, color 0.2s' }}>
-      <Header lastUpdated={data.lastUpdated} isDark={isDark} onToggleTheme={() => setIsDark(d => !d)} theme={theme} />
+      <Header
+        lastUpdated={data.lastUpdated} isDark={isDark} onToggleTheme={() => setIsDark(d => !d)} theme={theme}
+        lang={lang} onToggleLang={() => setLang(l => (l === 'en' ? 'de' : 'en'))} onExportPdf={() => window.print()}
+      />
+
+      {/* Print-only capture date */}
+      <div className="print-only" style={{ padding: '8px 32px', fontSize: 12, color: theme.textMuted }}>
+        {t(lang, 'pricingCaptured')}: {new Date(data.lastUpdated).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+      </div>
 
       <div style={{ padding: '24px 32px', maxWidth: 1400, margin: '0 auto' }}>
         <PriceChangeAlert changes={recentChanges} theme={theme} />
@@ -88,17 +100,17 @@ export default function App() {
         {/* Elli pricing cards */}
         <div style={{ marginBottom: 28 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
-            Elli Fleet Pricing (Current)
+            {t(lang, 'elliPricingCurrent')}
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             {/* Flex card */}
             <div style={{ background: theme.surface, border: `1px solid ${theme.borderSubtle}`, borderRadius: 12, padding: '20px 24px', minWidth: 200, opacity: 0.75 }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>Elli – Flex</div>
-              <div style={{ fontSize: 12, color: '#00C896', marginBottom: 10 }}>Ideal for occasional charging</div>
+              <div style={{ fontSize: 12, color: '#00C896', marginBottom: 10 }}>{t(lang, 'idealOccasional')}</div>
               <div style={{ fontSize: 22, fontWeight: 700, color: '#A855F7', marginBottom: 10 }}>
-                € 3,50<span style={{ fontSize: 12, fontWeight: 400, color: theme.textMuted, marginLeft: 4 }}>/ card / mo</span>
+                € 3,50<span style={{ fontSize: 12, fontWeight: 400, color: theme.textMuted, marginLeft: 4 }}>{t(lang, 'perCardMonth')}</span>
               </div>
-              <div style={{ fontSize: 12, color: theme.textMuted }}>Variable pass-through pricing</div>
+              <div style={{ fontSize: 12, color: theme.textMuted }}>{t(lang, 'variablePassThrough')}</div>
             </div>
             {elliProviders.map(p => <ElliPricingCard key={p.id} provider={p} theme={theme} />)}
           </div>
@@ -108,12 +120,13 @@ export default function App() {
         <div style={{ background: theme.surface, borderRadius: 14, border: `1px solid ${theme.border}`, padding: '36px 32px 28px', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
             <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: theme.text }}>Side-by-side Fleet tariff comparison with other providers</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: theme.text }}>{t(lang, 'chartTitle')}</div>
             </div>
             <div style={{ display: 'flex', background: theme.inputBg, borderRadius: 24, padding: 4, border: `1px solid ${theme.borderSubtle}` }}>
               <TabButton active={type === 'ac'} onClick={() => setType('ac')} theme={theme}>AC</TabButton>
               <TabButton active={type === 'dc'} onClick={() => setType('dc')} theme={theme}>DC</TabButton>
-              <TabButton active={type === 'blocking'} onClick={() => setType('blocking')} theme={theme}>Blocking Fees</TabButton>
+              <TabButton active={type === 'blocking'} onClick={() => setType('blocking')} theme={theme}>{t(lang, 'tabBlocking')}</TabButton>
+              <TabButton active={type === 'base'} onClick={() => setType('base')} theme={theme}>{t(lang, 'tabBaseFees')}</TabButton>
             </div>
           </div>
           {type === 'blocking' ? (
@@ -122,20 +135,22 @@ export default function App() {
                 <button onClick={() => setBlockingSubType('ac')} style={{ padding: '4px 16px', borderRadius: 16, border: `1px solid ${theme.border}`, background: blockingSubType === 'ac' ? theme.border : 'transparent', color: blockingSubType === 'ac' ? theme.text : theme.textMuted, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>AC</button>
                 <button onClick={() => setBlockingSubType('dc')} style={{ padding: '4px 16px', borderRadius: 16, border: `1px solid ${theme.border}`, background: blockingSubType === 'dc' ? theme.border : 'transparent', color: blockingSubType === 'dc' ? theme.text : theme.textMuted, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>DC</button>
               </div>
-              <BlockingFeeChart competitors={competitors} elliProviders={elliProviders} type={blockingSubType} theme={theme} />
+              <BlockingFeeChart competitors={competitors} elliProviders={elliProviders} type={blockingSubType} theme={theme} lang={lang} />
             </>
+          ) : type === 'base' ? (
+            <BaseFeeChart competitors={competitors} elliProviders={elliProviders} theme={theme} lang={lang} />
           ) : (
-            <PriceCorridorChart competitors={competitors} elliProviders={elliProviders} type={type} theme={theme} />
+            <PriceCorridorChart competitors={competitors} elliProviders={elliProviders} type={type} theme={theme} lang={lang} />
           )}
         </div>
 
         {/* Scraper status footer */}
         <div style={{ background: theme.surface, borderRadius: 10, border: `1px solid ${theme.borderSubtle}`, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ fontSize: 11, color: theme.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Data Sources</div>
+          <div style={{ fontSize: 11, color: theme.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t(lang, 'dataSources')}</div>
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
             {scraperTargets.map(name => <ScraperBadge key={name} provider={name} status={scraperStatus} theme={theme} />)}
           </div>
-          <div style={{ fontSize: 11, color: theme.textMuted }}>Auto-updated bi-weekly · GitHub Actions</div>
+          <div style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'autoUpdated')}</div>
         </div>
       </div>
     </div>
