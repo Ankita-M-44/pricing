@@ -33,6 +33,13 @@ export interface CompetitorProvider {
   tiers: CompetitorTier[];
   blockingFees?: BlockingFees;
   baseFees?: BaseFeeEntry[];
+  sourceUrl?: string;
+  packet?: PacketRow[];
+}
+
+export interface PacketRow {
+  label: string;
+  value: string;
 }
 
 export interface ElliProvider {

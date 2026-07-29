@@ -7,6 +7,7 @@ from playwright.sync_api import sync_playwright
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 
 FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.42), PricePoint(0.52, 0.76, 0.62))
+# Verified tariff source (PDF): https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf
 TARGET_URL = "https://www.uta.com/de-de/loesungen/elektromobilitaet"
 
 

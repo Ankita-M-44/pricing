@@ -71,6 +71,33 @@
           "tier": "L",
           "amount": 17.99
         }
+      ],
+      "sourceUrl": "https://www.enbw.com/elektromobilitaet/produkte/ladetarife",
+      "packet": [
+        {
+          "label": "EnBW-Ladestationen",
+          "value": "56 ct/kWh"
+        },
+        {
+          "label": "Im Aktionszeitraum",
+          "value": "51 ct/kWh"
+        },
+        {
+          "label": "Andere Betreiber",
+          "value": "ab 56 · max. 89 ct/kWh"
+        },
+        {
+          "label": "Monatliche Grundgebühr",
+          "value": "0 €"
+        },
+        {
+          "label": "Erste Ladekarte",
+          "value": "9,90 €"
+        },
+        {
+          "label": "Blockiergebühr (> 4 h)",
+          "value": "10 ct/min · max. 12,00 €"
+        }
       ]
     },
     {
@@ -109,6 +136,33 @@
           "amount": 1.5,
           "note": "Card service fee"
         }
+      ],
+      "sourceUrl": "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road",
+      "packet": [
+        {
+          "label": "AC-Ladung",
+          "value": "0,28 – 0,65 €/kWh (Level 1–5)"
+        },
+        {
+          "label": "DC-Ladung",
+          "value": "0,52 – 0,69 €/kWh (Level 1–4)"
+        },
+        {
+          "label": "Fair Use AC (6–18 Uhr)",
+          "value": "0,10 €/min nach 210 Min"
+        },
+        {
+          "label": "Fair Use AC (18–6 Uhr)",
+          "value": "0,02 €/min nach 210 Min"
+        },
+        {
+          "label": "Fair Use DC",
+          "value": "0,10 €/min nach 45 Min"
+        },
+        {
+          "label": "Kartengebühr",
+          "value": "1,50 € / Monat"
+        }
       ]
     },
     {
@@ -145,6 +199,29 @@
           "tier": null,
           "amount": 2.0,
           "note": "Card service fee"
+        }
+      ],
+      "sourceUrl": "https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf",
+      "packet": [
+        {
+          "label": "AC-Ladung",
+          "value": "0,28 – 0,69 €/kWh"
+        },
+        {
+          "label": "DC-Ladung",
+          "value": "0,52 – 0,76 €/kWh"
+        },
+        {
+          "label": "Charge & Park AC",
+          "value": "0,10 €/min ab 210 Min"
+        },
+        {
+          "label": "Charge & Park DC",
+          "value": "0,12 €/min ab 60 Min"
+        },
+        {
+          "label": "Kartengebühr",
+          "value": "2,00 € / Monat"
         }
       ]
     },
@@ -183,6 +260,29 @@
           "tier": null,
           "amount": 1.75,
           "note": "Shell Card fee"
+        }
+      ],
+      "sourceUrl": "https://www.shell.de/motoristen/shell-recharge/fuer-unternehmen.html",
+      "packet": [
+        {
+          "label": "AC-Ladung",
+          "value": "0,59 – 0,65 €/kWh"
+        },
+        {
+          "label": "DC-Ladung",
+          "value": "0,59 – 0,65 €/kWh"
+        },
+        {
+          "label": "Blockiergebühr AC",
+          "value": "befreit"
+        },
+        {
+          "label": "Blockiergebühr DC",
+          "value": "0,15 €/min nach 60 Min"
+        },
+        {
+          "label": "Kartengebühr",
+          "value": "1,75 € / Monat"
         }
       ]
     },
@@ -223,6 +323,33 @@
         {
           "tier": null,
           "amount": 0.0
+        }
+      ],
+      "sourceUrl": "https://www.aral.de/de/global/retail/pulse/tarife-bezahlmethoden.html",
+      "packet": [
+        {
+          "label": "AC-Ladung",
+          "value": "0,43 – 0,68 €/kWh"
+        },
+        {
+          "label": "DC-Ladung",
+          "value": "0,49 – 0,72 €/kWh"
+        },
+        {
+          "label": "Blockiergebühr AC",
+          "value": "0,15 €/min nach 120 Min · max. 10 €"
+        },
+        {
+          "label": "Blockiergebühr DC",
+          "value": "0,15 €/min nach 45 Min · max. 10 €"
+        },
+        {
+          "label": "Grundgebühr",
+          "value": "0 €"
+        },
+        {
+          "label": "Hinweis",
+          "value": "Blockiergebühr nur Roaming"
         }
       ]
     },

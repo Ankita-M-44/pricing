@@ -10,7 +10,7 @@ from base_scraper import BaseScraper, TierPrice, PricePoint
 
 
 TIER_PAGES = {
-    "S": "https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-s/",
+    "S": "https://www.enbw.com/elektromobilitaet/produkte/ladetarife",
     "M": "https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-m/",
     "L": "https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-l/",
 }

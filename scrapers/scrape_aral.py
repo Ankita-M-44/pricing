@@ -9,6 +9,7 @@ from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 
 FALLBACK = TierPrice(None, PricePoint(0.43, 0.68, 0.52), PricePoint(0.49, 0.72, 0.57))
 TARGET_URLS = [
+    "https://www.aral.de/de/global/retail/pulse/tarife-bezahlmethoden.html",
     "https://www.aralpulse.com/de/fuer-unternehmen/",
     "https://www.aralpulse.com/de/tarife/",
     "https://www.aralpulse.com/de/",

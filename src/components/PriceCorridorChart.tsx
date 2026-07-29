@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { CompetitorProvider, ElliProvider, ChargingType } from '../types';
 import type { Theme } from '../theme';
 import type { Lang } from '../i18n';
@@ -59,6 +60,7 @@ const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80];
 
 export default function PriceCorridorChart({ competitors, elliProviders, type, theme, lang }: Props) {
   const overlayLines = getAllElliLines(elliProviders, type);
+  const [hovered, setHovered] = useState<{ provider: CompetitorProvider; rowIdx: number } | null>(null);
 
   const rows: Array<{ label: string; provider: CompetitorProvider; tierIdx: number }> = [];
   for (const p of competitors) {
@@ -107,6 +109,12 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
 
             return (
               <div key={row.label}>
+                {/* Hover strip for packet tooltip */}
+                <div
+                  onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri })}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{ position: 'absolute', left: 0, right: 0, top, height: ROW_H, zIndex: 4, cursor: row.provider.packet ? 'help' : 'default' }}
+                />
                 <div style={{ position: 'absolute', left: `${pct(pp.min)}%`, top: top + 4, fontSize: 10, color: theme.textMuted, transform: 'translateX(-100%) translateX(-3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   {fmt(pp.min)}
                 </div>
@@ -171,6 +179,43 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
               </div>
             );
           })}
+
+          {/* Packet tooltip on hover */}
+          {hovered && hovered.provider.packet && (
+            <div style={{
+              position: 'absolute',
+              left: '50%',
+              top: (hovered.rowIdx + 1) * ROW_H + 4,
+              transform: 'translateX(-50%)',
+              background: theme.surface,
+              border: `1px solid ${theme.border}`,
+              borderRadius: 10,
+              padding: '14px 18px',
+              minWidth: 320,
+              zIndex: 10,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+              pointerEvents: 'none',
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
+                {hovered.provider.name}
+              </div>
+              {hovered.provider.packet.map((pr, i) => (
+                <div key={i} style={{
+                  display: 'flex', justifyContent: 'space-between', gap: 24,
+                  padding: '4px 0', fontSize: 11,
+                  borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
+                }}>
+                  <span style={{ color: theme.textMuted }}>{pr.label}</span>
+                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
+                </div>
+              ))}
+              {hovered.provider.sourceUrl && (
+                <div style={{ marginTop: 8, fontSize: 9, color: theme.textMuted, opacity: 0.7, wordBreak: 'break-all' }}>
+                  {tr(lang, 'source')}: {hovered.provider.sourceUrl.replace('https://', '').split('/')[0]}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Elli overlay lines — extend full height through competitor AND Elli rows */}
           {overlayLines.map((line, i) => (

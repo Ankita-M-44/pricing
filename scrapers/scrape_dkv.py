@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 
 FALLBACK = TierPrice(None, PricePoint(0.28, 0.65, 0.38), PricePoint(0.52, 0.69, 0.58))
-TARGET_URL = "https://www.dkv-mobility.com/de/produkte-services/laden/"
+TARGET_URL = "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road"
 
 
 def _extract_kwh_prices(text: str) -> list[float]:

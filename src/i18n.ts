@@ -39,6 +39,7 @@ const strings = {
   allValuesMonth: { en: 'All values in € / card / month', de: 'Alle Werte in € / Karte / Monat' },
   noBaseFee: { en: 'no base fee', de: 'keine Grundgebühr' },
   competitor: { en: 'Competitor', de: 'Wettbewerber' },
+  source: { en: 'Source', de: 'Quelle' },
 } as const;
 
 export type StringKey = keyof typeof strings;
