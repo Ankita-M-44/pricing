@@ -60,7 +60,7 @@ const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80];
 
 export default function PriceCorridorChart({ competitors, elliProviders, type, theme, lang }: Props) {
   const overlayLines = getAllElliLines(elliProviders, type);
-  const [hovered, setHovered] = useState<{ provider: CompetitorProvider; rowIdx: number } | null>(null);
+  const [hovered, setHovered] = useState<{ provider: CompetitorProvider; rowIdx: number; tier: string | null } | null>(null);
 
   const rows: Array<{ label: string; provider: CompetitorProvider; tierIdx: number }> = [];
   for (const p of competitors) {
@@ -111,7 +111,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
               <div key={row.label}>
                 {/* Hover strip for packet tooltip */}
                 <div
-                  onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri })}
+                  onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri, tier: row.provider.tiers[row.tierIdx].tier })}
                   onMouseLeave={() => setHovered(null)}
                   style={{ position: 'absolute', left: 0, right: 0, top, height: ROW_H, zIndex: 4, cursor: row.provider.packet ? 'help' : 'default' }}
                 />
@@ -197,18 +197,25 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
               pointerEvents: 'none',
             }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
-                {hovered.provider.name}
+                {hovered.provider.name}{hovered.tier ? ` – Tarif ${hovered.tier}` : ''}
               </div>
-              {hovered.provider.packet.map((pr, i) => (
+              {hovered.provider.packet.map((pr, i) => {
+                let value = pr.value;
+                if (pr.label.includes('Grundgebühr') && hovered.tier) {
+                  const bf = hovered.provider.baseFees?.find(b => b.tier === hovered.tier);
+                  if (bf) value = `${bf.amount.toFixed(2).replace('.', ',')} €`;
+                }
+                return (
                 <div key={i} style={{
                   display: 'flex', justifyContent: 'space-between', gap: 24,
                   padding: '4px 0', fontSize: 11,
                   borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
                 }}>
                   <span style={{ color: theme.textMuted }}>{pr.label}</span>
-                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
+                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{value}</span>
                 </div>
-              ))}
+                );
+              })}
               {hovered.provider.sourceUrl && (
                 <div style={{ marginTop: 8, fontSize: 9, color: theme.textMuted, opacity: 0.7, wordBreak: 'break-all' }}>
                   {tr(lang, 'source')}: {hovered.provider.sourceUrl.replace('https://', '').split('/')[0]}
