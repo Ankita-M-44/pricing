@@ -70,22 +70,22 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
     });
   }
 
-  const competitorHeight = rows.length * ROW_H;
-  const totalHeight = competitorHeight + elliProviders.length * ROW_H;
+  const elliHeight = elliProviders.length * ROW_H;
+  const totalHeight = rows.length * ROW_H + elliHeight;
 
   return (
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex' }}>
         {/* Labels column */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
-          {rows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
-              {row.label}
-            </div>
-          ))}
           {elliProviders.map(p => (
             <div key={p.id} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
               {p.name}
+            </div>
+          ))}
+          {rows.map(row => (
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
+              {row.label}
             </div>
           ))}
         </div>
@@ -104,7 +104,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
           {rows.map((row, ri) => {
             const tier = row.provider.tiers[row.tierIdx];
             const pp = tier[type];
-            const top = ri * ROW_H;
+            const top = elliHeight + ri * ROW_H;
             const mid = top + ROW_H / 2;
 
             return (
@@ -150,7 +150,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
 
           {/* Elli rows */}
           {elliProviders.map((p, ei) => {
-            const top = competitorHeight + ei * ROW_H;
+            const top = ei * ROW_H;
             const mid = top + ROW_H / 2;
             const markers = getElliMarkersForRow(p, type);
 
@@ -185,7 +185,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
             <div style={{
               position: 'absolute',
               left: '50%',
-              top: (hovered.rowIdx + 1) * ROW_H + 4,
+              top: elliHeight + (hovered.rowIdx + 1) * ROW_H + 4,
               transform: 'translateX(-50%)',
               background: theme.surface,
               border: `1px solid ${theme.border}`,

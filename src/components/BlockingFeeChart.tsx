@@ -40,21 +40,21 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
     .filter(p => p.blockingFees)
     .map(p => ({ provider: p, fee: p.blockingFees![type] as BlockingFeePoint, isElli: true, label: p.name }));
 
-  const competitorHeight = competitorRows.length * ROW_H;
-  const totalHeight = competitorHeight + elliRows.length * ROW_H;
+  const elliHeight = elliRows.length * ROW_H;
+  const totalHeight = competitorRows.length * ROW_H + elliHeight;
 
   return (
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex' }}>
         {/* Labels */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
-          {competitorRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
+          {elliRows.map(row => (
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
               {row.label}
             </div>
           ))}
-          {elliRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          {competitorRows.map(row => (
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
               {row.label}
             </div>
           ))}
@@ -72,7 +72,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
 
           {/* Competitor rows */}
           {competitorRows.map((row, ri) => {
-            const top = ri * ROW_H;
+            const top = elliHeight + ri * ROW_H;
             const mid = top + ROW_H / 2;
             const fee = row.fee;
 
@@ -171,7 +171,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
 
           {/* Elli rows */}
           {elliRows.map((row, ei) => {
-            const top = competitorHeight + ei * ROW_H;
+            const top = ei * ROW_H;
             const mid = top + ROW_H / 2;
             const fee = row.fee;
             const barWidth = pct(fee.rate);

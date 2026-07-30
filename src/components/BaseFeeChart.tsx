@@ -38,8 +38,8 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
     ...elliProviders.map(p => ({ label: p.name, amount: p.monthlyFee })),
   ];
 
-  const competitorHeight = competitorRows.length * ROW_H;
-  const totalHeight = competitorHeight + elliRows.length * ROW_H;
+  const elliHeight = elliRows.length * ROW_H;
+  const totalHeight = competitorRows.length * ROW_H + elliHeight;
 
   const renderBar = (amount: number, mid: number, color: string, bold: boolean) => {
     if (amount === 0) {
@@ -80,13 +80,13 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
       <div style={{ display: 'flex' }}>
         {/* Labels */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
-          {competitorRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
+          {elliRows.map(row => (
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
               {row.label}
             </div>
           ))}
-          {elliRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          {competitorRows.map(row => (
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
               {row.label}
             </div>
           ))}
@@ -103,7 +103,7 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
 
           {/* Competitor rows */}
           {competitorRows.map((row, ri) => {
-            const top = ri * ROW_H;
+            const top = elliHeight + ri * ROW_H;
             const mid = top + ROW_H / 2;
             return (
               <div key={row.label}>
@@ -119,7 +119,7 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
 
           {/* Elli rows */}
           {elliRows.map((row, ei) => {
-            const top = competitorHeight + ei * ROW_H;
+            const top = ei * ROW_H;
             const mid = top + ROW_H / 2;
             return (
               <div key={row.label}>
