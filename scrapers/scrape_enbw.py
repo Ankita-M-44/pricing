@@ -14,14 +14,15 @@ from base_scraper import BaseScraper, TierPrice, PricePoint
 
 TARGET_URL = "https://www.enbw.com/elektromobilitaet/produkte/ladetarife"
 
-# Last manually verified: 2026-08-01
-# Tier S: EnBW stations 42.86 ct/kWh, other operators up to 74.79 ct/kWh
-# Tier M: EnBW stations 34.46 ct/kWh, other operators up to 74.79 ct/kWh
-# Tier L: EnBW stations 28.57 ct/kWh, other operators up to 74.79 ct/kWh
+# Last manually verified: 2026-08-05
+# Tier S: EnBW stations 56 ct/kWh (promo 51), other operators ab 56, max 89 ct/kWh
+# Tier M: EnBW stations 46 ct/kWh (promo 41), other operators ab 56, max 89 ct/kWh
+# Tier L: EnBW stations 39 ct/kWh (promo 34), other operators ab 56, max 89 ct/kWh
+# Promo valid 08.07.–30.09.2026; min = promo rate, median = regular EnBW rate
 FALLBACK = {
-    "S": TierPrice("S", PricePoint(0.4286, 0.7479, 0.4706), PricePoint(0.4286, 0.7479, 0.4706)),
-    "M": TierPrice("M", PricePoint(0.3446, 0.7479, 0.3866), PricePoint(0.3446, 0.7479, 0.3866)),
-    "L": TierPrice("L", PricePoint(0.2857, 0.7479, 0.3277), PricePoint(0.2857, 0.7479, 0.3277)),
+    "S": TierPrice("S", PricePoint(0.51, 0.89, 0.56), PricePoint(0.51, 0.89, 0.56)),
+    "M": TierPrice("M", PricePoint(0.41, 0.89, 0.46), PricePoint(0.41, 0.89, 0.46)),
+    "L": TierPrice("L", PricePoint(0.34, 0.89, 0.39), PricePoint(0.34, 0.89, 0.39)),
 }
 
 USER_AGENT = (

@@ -7,11 +7,12 @@
       "isElli": false,
       "sourceUrl": "https://www.enbw.com/elektromobilitaet/produkte/laden-unterwegs/flottenprodukte/",
       "packet": [
-        { "label": "EnBW-Ladestationen", "value": "43 – 75 ct/kWh" },
-        { "label": "Andere Betreiber", "value": "ab 29 · max. 75 ct/kWh" },
+        { "label": "EnBW-Ladestationen", "value": "56 ct/kWh" },
+        { "label": "Im Aktionszeitraum (bis 30.09.2026)", "value": "51 / 41 / 34 ct/kWh (S/M/L)" },
+        { "label": "Andere Betreiber", "value": "ab 56 · max. 89 ct/kWh" },
         { "label": "Monatliche Grundgebühr S", "value": "0 €" },
         { "label": "Monatliche Grundgebühr M", "value": "5,99 €" },
-        { "label": "Monatliche Grundgebühr L", "value": "17,99 €" },
+        { "label": "Monatliche Grundgebühr L", "value": "11,99 €" },
         { "label": "Blockiergebühr (> 4 h)", "value": "10 ct/min · max. 12,00 €" }
       ],
       "blockingFees": {
@@ -21,23 +22,23 @@
       "baseFees": [
         { "tier": "S", "amount": 0 },
         { "tier": "M", "amount": 5.99 },
-        { "tier": "L", "amount": 17.99 }
+        { "tier": "L", "amount": 11.99 }
       ],
       "tiers": [
         {
           "tier": "S",
-          "ac": { "min": 0.4286, "max": 0.7479, "median": 0.4706 },
-          "dc": { "min": 0.4286, "max": 0.7479, "median": 0.4706 }
+          "ac": { "min": 0.51, "max": 0.89, "median": 0.56 },
+          "dc": { "min": 0.51, "max": 0.89, "median": 0.56 }
         },
         {
           "tier": "M",
-          "ac": { "min": 0.3446, "max": 0.7479, "median": 0.3866 },
-          "dc": { "min": 0.3446, "max": 0.7479, "median": 0.3866 }
+          "ac": { "min": 0.41, "max": 0.89, "median": 0.46 },
+          "dc": { "min": 0.41, "max": 0.89, "median": 0.46 }
         },
         {
           "tier": "L",
-          "ac": { "min": 0.2857, "max": 0.7479, "median": 0.3277 },
-          "dc": { "min": 0.2857, "max": 0.7479, "median": 0.3277 }
+          "ac": { "min": 0.34, "max": 0.89, "median": 0.39 },
+          "dc": { "min": 0.34, "max": 0.89, "median": 0.39 }
         }
       ]
     },
@@ -214,9 +215,9 @@
           "name": "EnBW",
           "isElli": false,
           "tiers": [
-            { "tier": "S", "ac": { "min": 0.4286, "max": 0.7479, "median": 0.4706 }, "dc": { "min": 0.4286, "max": 0.7479, "median": 0.4706 } },
-            { "tier": "M", "ac": { "min": 0.3446, "max": 0.7479, "median": 0.3866 }, "dc": { "min": 0.3446, "max": 0.7479, "median": 0.3866 } },
-            { "tier": "L", "ac": { "min": 0.2857, "max": 0.7479, "median": 0.3277 }, "dc": { "min": 0.2857, "max": 0.7479, "median": 0.3277 } }
+            { "tier": "S", "ac": { "min": 0.51, "max": 0.89, "median": 0.56 }, "dc": { "min": 0.51, "max": 0.89, "median": 0.56 } },
+            { "tier": "M", "ac": { "min": 0.41, "max": 0.89, "median": 0.46 }, "dc": { "min": 0.41, "max": 0.89, "median": 0.46 } },
+            { "tier": "L", "ac": { "min": 0.34, "max": 0.89, "median": 0.39 }, "dc": { "min": 0.34, "max": 0.89, "median": 0.39 } }
           ]
         },
         { "id": "dkv", "name": "DKV", "isElli": false, "tiers": [{ "tier": null, "ac": { "min": 0.28, "max": 0.65, "median": 0.38 }, "dc": { "min": 0.52, "max": 0.69, "median": 0.58 } }] },
