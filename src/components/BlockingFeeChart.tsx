@@ -87,7 +87,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
             }
 
             const barWidth = pct(fee.rate);
-            const barColor = fee.rate >= 0.13 ? '#A83232' : fee.rate >= 0.10 ? '#A07010' : '#6E6890';
+            const barColor = fee.rate >= 0.13 ? '#A83232' : '#6E6890';
 
             const labelRight = barWidth > 78;
             const stackVertical = row.provider.name === 'Shell' || row.provider.name === 'Aral pulse';
@@ -230,10 +230,6 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 20, height: 3, background: '#6E6890', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorModerate')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#A07010', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorHigh')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 20, height: 3, background: '#A83232', borderRadius: 2 }} />
