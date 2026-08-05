@@ -6,15 +6,6 @@
       "name": "EnBW",
       "isElli": false,
       "sourceUrl": "https://www.enbw.com/elektromobilitaet/produkte/laden-unterwegs/flottenprodukte/",
-      "packet": [
-        { "label": "EnBW-Ladestationen", "value": "56 ct/kWh" },
-        { "label": "Im Aktionszeitraum (bis 30.09.2026)", "value": "51 / 41 / 34 ct/kWh (S/M/L)" },
-        { "label": "Andere Betreiber", "value": "ab 56 · max. 89 ct/kWh" },
-        { "label": "Monatliche Grundgebühr S", "value": "0 €" },
-        { "label": "Monatliche Grundgebühr M", "value": "5,99 €" },
-        { "label": "Monatliche Grundgebühr L", "value": "11,99 €" },
-        { "label": "Blockiergebühr (> 4 h)", "value": "10 ct/min · max. 12,00 €" }
-      ],
       "blockingFees": {
         "ac": { "rate": 0.10, "graceMins": 240, "cap": 12.00 },
         "dc": { "rate": 0.10, "graceMins": 240, "cap": 12.00 }
@@ -28,17 +19,41 @@
         {
           "tier": "S",
           "ac": { "min": 0.51, "max": 0.89, "median": 0.56 },
-          "dc": { "min": 0.51, "max": 0.89, "median": 0.56 }
+          "dc": { "min": 0.51, "max": 0.89, "median": 0.56 },
+          "packet": [
+            { "label": "EnBW-Ladestationen", "value": "56 ct/kWh" },
+            { "label": "Im Aktionszeitraum (bis 30.09.2026)", "value": "51 ct/kWh" },
+            { "label": "Andere Betreiber", "value": "ab 56 · max. 89 ct/kWh" },
+            { "label": "Monatliche Grundgebühr", "value": "0 €" },
+            { "label": "Erste Ladekarte", "value": "9,90 €" },
+            { "label": "Blockiergebühr (> 4 h)", "value": "10 ct/min · max. 12,00 €" }
+          ]
         },
         {
           "tier": "M",
           "ac": { "min": 0.41, "max": 0.89, "median": 0.46 },
-          "dc": { "min": 0.41, "max": 0.89, "median": 0.46 }
+          "dc": { "min": 0.41, "max": 0.89, "median": 0.46 },
+          "packet": [
+            { "label": "EnBW-Ladestationen", "value": "46 ct/kWh" },
+            { "label": "Im Aktionszeitraum (bis 30.09.2026)", "value": "41 ct/kWh" },
+            { "label": "Andere Betreiber", "value": "ab 56 · max. 89 ct/kWh" },
+            { "label": "Monatliche Grundgebühr", "value": "5,99 €" },
+            { "label": "Erste Ladekarte (optional)", "value": "9,90 € kostenlos" },
+            { "label": "Blockiergebühr (> 4 h)", "value": "10 ct/min · max. 12,00 €" }
+          ]
         },
         {
           "tier": "L",
           "ac": { "min": 0.34, "max": 0.89, "median": 0.39 },
-          "dc": { "min": 0.34, "max": 0.89, "median": 0.39 }
+          "dc": { "min": 0.34, "max": 0.89, "median": 0.39 },
+          "packet": [
+            { "label": "EnBW-Ladestationen", "value": "39 ct/kWh" },
+            { "label": "Im Aktionszeitraum (bis 30.09.2026)", "value": "34 ct/kWh" },
+            { "label": "Andere Betreiber", "value": "ab 56 · max. 89 ct/kWh" },
+            { "label": "Monatliche Grundgebühr", "value": "11,99 €" },
+            { "label": "Erste Ladekarte (optional)", "value": "9,90 € kostenlos" },
+            { "label": "Blockiergebühr (> 4 h)", "value": "10 ct/min · max. 12,00 €" }
+          ]
         }
       ]
     },

@@ -1,3 +1,8 @@
+export interface PacketRow {
+  label: string;
+  value: string;
+}
+
 export interface CompetitorPricePoint {
   min: number;
   max: number;
@@ -8,6 +13,7 @@ export interface CompetitorTier {
   tier: string | null;
   ac: CompetitorPricePoint;
   dc: CompetitorPricePoint;
+  packet?: PacketRow[];
 }
 
 export interface ElliAcPrice {
@@ -35,11 +41,6 @@ export interface CompetitorProvider {
   baseFees?: BaseFeeEntry[];
   sourceUrl?: string;
   packet?: PacketRow[];
-}
-
-export interface PacketRow {
-  label: string;
-  value: string;
 }
 
 export interface ElliProvider {

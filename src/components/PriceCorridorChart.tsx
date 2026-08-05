@@ -113,7 +113,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                 <div
                   onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri, tier: row.provider.tiers[row.tierIdx].tier })}
                   onMouseLeave={() => setHovered(null)}
-                  style={{ position: 'absolute', left: 0, right: 0, top, height: ROW_H, zIndex: 4, cursor: row.provider.packet ? 'help' : 'default' }}
+                  style={{ position: 'absolute', left: 0, right: 0, top, height: ROW_H, zIndex: 4, cursor: (row.provider.tiers[row.tierIdx].packet ?? row.provider.packet) ? 'help' : 'default' }}
                 />
                 <div style={{ position: 'absolute', left: `${pct(pp.min)}%`, top: top + 4, fontSize: 10, color: theme.textMuted, transform: 'translateX(-100%) translateX(-3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   {fmt(pp.min)}
@@ -181,7 +181,11 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
           })}
 
           {/* Packet tooltip on hover */}
-          {hovered && hovered.provider.packet && (
+          {hovered && (() => {
+            const hoveredTierObj = hovered.provider.tiers.find(t => t.tier === hovered.tier);
+            const packet = hoveredTierObj?.packet ?? hovered.provider.packet;
+            if (!packet) return null;
+            return (
             <div style={{
               position: 'absolute',
               left: '50%',
@@ -199,30 +203,24 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
               <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
                 {hovered.provider.name}{hovered.tier ? ` – Tarif ${hovered.tier}` : ''}
               </div>
-              {hovered.provider.packet.map((pr, i) => {
-                let value = pr.value;
-                if (pr.label.includes('Grundgebühr') && hovered.tier) {
-                  const bf = hovered.provider.baseFees?.find(b => b.tier === hovered.tier);
-                  if (bf) value = `${bf.amount.toFixed(2).replace('.', ',')} €`;
-                }
-                return (
+              {packet.map((pr, i) => (
                 <div key={i} style={{
                   display: 'flex', justifyContent: 'space-between', gap: 24,
                   padding: '4px 0', fontSize: 11,
                   borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
                 }}>
                   <span style={{ color: theme.textMuted }}>{pr.label}</span>
-                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{value}</span>
+                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
                 </div>
-                );
-              })}
+              ))}
               {hovered.provider.sourceUrl && (
                 <div style={{ marginTop: 8, fontSize: 9, color: theme.textMuted, opacity: 0.7, wordBreak: 'break-all' }}>
                   {tr(lang, 'source')}: {hovered.provider.sourceUrl.replace('https://', '').split('/')[0]}
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {/* Elli overlay lines — extend full height through competitor AND Elli rows */}
           {overlayLines.map((line, i) => (
