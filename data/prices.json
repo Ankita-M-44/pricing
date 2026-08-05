@@ -6,6 +6,14 @@
       "name": "EnBW",
       "isElli": false,
       "sourceUrl": "https://www.enbw.com/elektromobilitaet/produkte/laden-unterwegs/flottenprodukte/",
+      "packet": [
+        { "label": "EnBW-Ladestationen", "value": "43 – 75 ct/kWh" },
+        { "label": "Andere Betreiber", "value": "ab 29 · max. 75 ct/kWh" },
+        { "label": "Monatliche Grundgebühr S", "value": "0 €" },
+        { "label": "Monatliche Grundgebühr M", "value": "5,99 €" },
+        { "label": "Monatliche Grundgebühr L", "value": "17,99 €" },
+        { "label": "Blockiergebühr (> 4 h)", "value": "10 ct/min · max. 12,00 €" }
+      ],
       "blockingFees": {
         "ac": { "rate": 0.10, "graceMins": 240, "cap": 12.00 },
         "dc": { "rate": 0.10, "graceMins": 240, "cap": 12.00 }
@@ -38,6 +46,14 @@
       "name": "DKV",
       "isElli": false,
       "sourceUrl": "https://www.dkv-mobility.com/de/loesungen/elektromobilitaet/",
+      "packet": [
+        { "label": "AC-Ladung", "value": "0,28 – 0,65 €/kWh" },
+        { "label": "DC-Ladung", "value": "0,52 – 0,69 €/kWh" },
+        { "label": "Fair Use AC (6–18 Uhr)", "value": "0,10 €/min nach 210 Min" },
+        { "label": "Fair Use AC (18–6 Uhr)", "value": "0,02 €/min nach 210 Min" },
+        { "label": "Fair Use DC", "value": "0,10 €/min nach 45 Min" },
+        { "label": "Kartengebühr", "value": "1,50 € / Monat" }
+      ],
       "blockingFees": {
         "ac": { "rate": 0.10, "graceMins": 210, "note": "Daytime (06–18h) · night rate 0,02 €/min" },
         "dc": { "rate": 0.10, "graceMins": 45 }
@@ -58,6 +74,13 @@
       "name": "UTA",
       "isElli": false,
       "sourceUrl": "https://www.uta.com/de/produkte/elektromobilitaet",
+      "packet": [
+        { "label": "AC-Ladung", "value": "0,28 – 0,69 €/kWh" },
+        { "label": "DC-Ladung", "value": "0,52 – 0,76 €/kWh" },
+        { "label": "Charge & Park AC", "value": "0,10 €/min ab 210 Min" },
+        { "label": "Charge & Park DC", "value": "0,12 €/min ab 60 Min" },
+        { "label": "Kartengebühr", "value": "2,00 € / Monat" }
+      ],
       "blockingFees": {
         "ac": { "rate": 0.10, "graceMins": 210 },
         "dc": { "rate": 0.12, "graceMins": 60 }
@@ -78,6 +101,13 @@
       "name": "Shell",
       "isElli": false,
       "sourceUrl": "https://www.shell.de/fahrer/shellrecharge-loesungen/flotten.html",
+      "packet": [
+        { "label": "AC-Ladung", "value": "0,59 – 0,65 €/kWh" },
+        { "label": "DC-Ladung", "value": "0,59 – 0,65 €/kWh" },
+        { "label": "Blockiergebühr AC", "value": "befreit" },
+        { "label": "Blockiergebühr DC", "value": "0,15 €/min nach 60 Min" },
+        { "label": "Kartengebühr", "value": "1,75 € / Monat" }
+      ],
       "blockingFees": {
         "ac": { "rate": 0, "graceMins": 0, "exempt": true },
         "dc": { "rate": 0.15, "graceMins": 60 }
@@ -98,6 +128,14 @@
       "name": "Aral pulse",
       "isElli": false,
       "sourceUrl": "https://www.aralpulse.com/de/flotte",
+      "packet": [
+        { "label": "AC-Ladung", "value": "0,41 – 0,68 €/kWh" },
+        { "label": "DC-Ladung", "value": "0,49 – 0,79 €/kWh" },
+        { "label": "Blockiergebühr AC", "value": "0,15 €/min nach 120 Min · max. 10 €" },
+        { "label": "Blockiergebühr DC", "value": "0,15 €/min nach 45 Min · max. 10 €" },
+        { "label": "Grundgebühr", "value": "0 €" },
+        { "label": "Hinweis", "value": "Blockiergebühr nur Roaming" }
+      ],
       "blockingFees": {
         "ac": { "rate": 0.15, "graceMins": 120, "cap": 10.00, "note": "Roaming sessions only" },
         "dc": { "rate": 0.15, "graceMins": 45, "cap": 10.00, "note": "Roaming sessions only" }
