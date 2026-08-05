@@ -9,7 +9,7 @@ import re
 import requests as _requests
 from contextlib import contextmanager
 from playwright.sync_api import sync_playwright, Page
-from playwright_stealth import stealth
+from playwright_stealth import Stealth
 
 
 FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
@@ -63,7 +63,7 @@ def _playwright_fetch(url: str, wait_selector: str | None, timeout: int) -> str:
             locale="de-DE",
         )
         page: Page = context.new_page()
-        stealth(page)
+        Stealth().use_sync(page)
 
         try:
             page.goto(url, timeout=timeout, wait_until="networkidle")
