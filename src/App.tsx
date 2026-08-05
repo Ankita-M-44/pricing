@@ -25,17 +25,6 @@ function TabButton({ active, onClick, children, theme }: { active: boolean; onCl
   );
 }
 
-function ScraperBadge({ provider, status, theme }: { provider: string; status: 'ok' | 'stale' | 'error'; theme: typeof dark }) {
-  const colors = { ok: '#00C896', stale: '#F59E0B', error: '#F87171' };
-  const labels = { ok: 'Live', stale: 'Stale', error: 'Error' };
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11 }}>
-      <div style={{ width: 6, height: 6, borderRadius: '50%', background: colors[status], boxShadow: status === 'ok' ? `0 0 6px ${colors[status]}` : 'none' }} />
-      <span style={{ color: theme.textMuted }}>{provider}</span>
-      <span style={{ color: colors[status] }}>{labels[status]}</span>
-    </div>
-  );
-}
 
 export default function App() {
   const [data, setData] = useState<PricesData | null>(null);
@@ -77,10 +66,6 @@ export default function App() {
       }
     }
   }
-
-  const ageMs = Date.now() - new Date(data.lastUpdated).getTime();
-  const scraperStatus: 'ok' | 'stale' | 'error' = ageMs < 2 * 86400 * 1000 ? 'ok' : ageMs < 16 * 86400 * 1000 ? 'stale' : 'error';
-  const scraperTargets = ['EnBW', 'Shell', 'DKV', 'UTA', 'Aral pulse'];
 
   return (
     <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.2s, color 0.2s' }}>
@@ -144,13 +129,9 @@ export default function App() {
           )}
         </div>
 
-        {/* Scraper status footer */}
-        <div style={{ background: theme.surface, borderRadius: 10, border: `1px solid ${theme.borderSubtle}`, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ fontSize: 11, color: theme.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t(lang, 'dataSources')}</div>
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            {scraperTargets.map(name => <ScraperBadge key={name} provider={name} status={scraperStatus} theme={theme} />)}
-          </div>
-          <div style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'autoUpdated')}</div>
+        {/* Disclaimer */}
+        <div style={{ padding: '14px 0', fontSize: 11, color: theme.textMuted, lineHeight: 1.6, opacity: 0.7 }}>
+          {t(lang, 'disclaimer')}
         </div>
       </div>
     </div>

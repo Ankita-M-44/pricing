@@ -40,6 +40,10 @@ const strings = {
   noBaseFee: { en: 'no base fee', de: 'keine Grundgebühr' },
   competitor: { en: 'Competitor', de: 'Wettbewerber' },
   source: { en: 'Source', de: 'Quelle' },
+  disclaimer: {
+    en: 'Disclaimer: Competitor pricing data is collected from publicly available sources and updated bi-weekly. Prices shown are indicative and may not reflect current tariffs, promotional rates, or regional variations. Always verify pricing directly with the respective provider before making purchasing decisions. Elli assumes no liability for the accuracy or completeness of third-party pricing information.',
+    de: 'Haftungsausschluss: Wettbewerbspreise werden aus öffentlich zugänglichen Quellen gesammelt und zweiwöchentlich aktualisiert. Die angezeigten Preise sind indikativ und spiegeln möglicherweise nicht die aktuellen Tarife, Aktionspreise oder regionale Unterschiede wider. Bitte überprüfen Sie die Preise stets direkt beim jeweiligen Anbieter, bevor Sie Kaufentscheidungen treffen. Elli übernimmt keine Haftung für die Richtigkeit oder Vollständigkeit von Drittanbieter-Preisinformationen.',
+  },
 } as const;
 
 export type StringKey = keyof typeof strings;
