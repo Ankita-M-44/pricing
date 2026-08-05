@@ -13,7 +13,7 @@ interface Props {
 }
 
 const CHART_MIN = 0.20;
-const CHART_MAX = 0.85;
+const CHART_MAX = 0.95;
 const LABEL_WIDTH = 148;
 const ROW_H = 38;
 
@@ -56,7 +56,7 @@ function getAllElliLines(elliProviders: ElliProvider[], type: ChargingType) {
   return Array.from(seen.entries()).map(([value, meta]) => ({ value, ...meta }));
 }
 
-const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80];
+const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90];
 
 export default function PriceCorridorChart({ competitors, elliProviders, type, theme, lang }: Props) {
   const overlayLines = getAllElliLines(elliProviders, type);
