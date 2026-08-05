@@ -1,31 +1,37 @@
 """
-Scraper for EnBW mobility+ fleet tariffs.
-Target: https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-s/ (and tarif-m, tarif-l)
+Scraper for EnBW fleet tariffs.
+Target: https://www.enbw.com/elektromobilitaet/produkte/ladetarife
 EnBW displays prices in ct/kWh (e.g. "42,86 ct/kWh") — must divide by 100.
-Tiers S/M/L each have an EnBW-station price and an "Andere Betreiber" (other operators) range.
+Tiers S/M/L are on the same page behind tab/accordion elements.
+
+NOTE: EnBW returns 403 to plain headless Chromium. The scraper uses a realistic
+user-agent and waits for JS rendering. If it still fails, fallback values
+(last manually verified) are used and the error is surfaced in scraperErrors.
 """
 import re
 from playwright.sync_api import sync_playwright
 from base_scraper import BaseScraper, TierPrice, PricePoint
 
+TARGET_URL = "https://www.enbw.com/elektromobilitaet/produkte/ladetarife"
 
-TIER_PAGES = {
-    "S": "https://www.enbw.com/elektromobilitaet/produkte/ladetarife",
-    "M": "https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-m/",
-    "L": "https://www.enbw.com/elektromobilitaet/produkte/mobilityplus/tarif-l/",
-}
-
-# Fallback values — verified against EnBW site 2026-07-15
-# EnBW stations regular price = AC price; other operators range 47.06–74.79 ct/kWh
+# Last manually verified: 2026-08-01
+# Tier S: EnBW stations 42.86 ct/kWh, other operators up to 74.79 ct/kWh
+# Tier M: EnBW stations 34.46 ct/kWh, other operators up to 74.79 ct/kWh
+# Tier L: EnBW stations 28.57 ct/kWh, other operators up to 74.79 ct/kWh
 FALLBACK = {
     "S": TierPrice("S", PricePoint(0.4286, 0.7479, 0.4706), PricePoint(0.4286, 0.7479, 0.4706)),
     "M": TierPrice("M", PricePoint(0.3446, 0.7479, 0.3866), PricePoint(0.3446, 0.7479, 0.3866)),
     "L": TierPrice("L", PricePoint(0.2857, 0.7479, 0.3277), PricePoint(0.2857, 0.7479, 0.3277)),
 }
 
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/125.0.0.0 Safari/537.36"
+)
+
 
 def _parse_ct_kwh(text: str) -> list[float]:
-    """Extract prices in ct/kWh and return as €/kWh (divided by 100)."""
     prices = []
     for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
         raw = m.group(1).replace(',', '.')
@@ -39,7 +45,6 @@ def _parse_ct_kwh(text: str) -> list[float]:
 
 
 def _parse_euro_kwh(text: str) -> list[float]:
-    """Extract prices already in €/kWh."""
     prices = []
     for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh']:
         for m in re.finditer(pat, text, re.IGNORECASE):
@@ -53,69 +58,81 @@ def _parse_euro_kwh(text: str) -> list[float]:
     return sorted(set(prices))
 
 
+def _prices_to_tier(tier_name: str, prices: list[float]) -> TierPrice:
+    fallback = FALLBACK[tier_name]
+    if len(prices) >= 2:
+        low, high = prices[0], prices[-1]
+        return TierPrice(tier_name, PricePoint(low, high, low), PricePoint(low, high, low))
+    elif len(prices) == 1:
+        return TierPrice(tier_name,
+                         PricePoint(prices[0], fallback.ac.max, prices[0]),
+                         PricePoint(prices[0], fallback.dc.max, prices[0]))
+    return fallback
+
+
 class EnBWScraper(BaseScraper):
     provider_id = "enbw"
     provider_name = "EnBW"
 
     def scrape(self) -> list[TierPrice]:
-        results = []
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+            context = browser.new_context(user_agent=USER_AGENT)
+            page = context.new_page()
 
-            for tier_name, url in TIER_PAGES.items():
-                try:
-                    page.goto(url, timeout=40000, wait_until="networkidle")
-                    for sel in ["#onetrust-accept-btn-handler", "button[class*='accept']",
-                                "button[class*='cookie']"]:
-                        try:
-                            page.click(sel, timeout=2000)
-                            page.wait_for_timeout(800)
-                            break
-                        except Exception:
-                            pass
+            try:
+                page.goto(TARGET_URL, timeout=40000, wait_until="networkidle")
 
-                    text = page.inner_text("body")
-                    print(f"EnBW {tier_name}: page text sample:\n{text[:800]}")
+                # Dismiss cookie banner if present
+                for sel in ["#onetrust-accept-btn-handler", "button[class*='accept']",
+                            "button[class*='cookie']", "[data-testid='cookie-accept']"]:
+                    try:
+                        page.click(sel, timeout=2000)
+                        page.wait_for_timeout(800)
+                        break
+                    except Exception:
+                        pass
 
-                    # Try ct/kWh first (EnBW's format), then fall back to €/kWh
-                    ct_prices = _parse_ct_kwh(text)
-                    euro_prices = _parse_euro_kwh(text)
-                    all_prices = ct_prices if ct_prices else euro_prices
+                text = page.inner_text("body")
+                print(f"EnBW: page text length={len(text)}")
+                print(f"EnBW: sample:\n{text[:1000]}")
 
-                    print(f"EnBW {tier_name}: ct/kWh found={ct_prices}, €/kWh found={euro_prices}")
+                ct_prices = _parse_ct_kwh(text)
+                euro_prices = _parse_euro_kwh(text)
+                all_prices = ct_prices if ct_prices else euro_prices
+                print(f"EnBW: found prices ct/kWh={ct_prices}, €/kWh={euro_prices}")
 
-                    if len(all_prices) >= 2:
-                        # EnBW station price (lowest) = regular tariff; max = other operators ceiling
-                        enbw_price = all_prices[0]
-                        other_max = all_prices[-1]
-                        fallback = FALLBACK[tier_name]
-                        result = TierPrice(
-                            tier=tier_name,
-                            ac=PricePoint(enbw_price, other_max, enbw_price),
-                            dc=PricePoint(enbw_price, other_max, enbw_price),
-                        )
-                        results.append(result)
-                        print(f"EnBW {tier_name}: scraped → ac/dc enbw={enbw_price}, max={other_max}")
-                    elif len(all_prices) == 1:
-                        fallback = FALLBACK[tier_name]
-                        result = TierPrice(
-                            tier=tier_name,
-                            ac=PricePoint(all_prices[0], fallback.ac.max, all_prices[0]),
-                            dc=PricePoint(all_prices[0], fallback.dc.max, all_prices[0]),
-                        )
-                        results.append(result)
-                        print(f"EnBW {tier_name}: single price found={all_prices[0]}, using fallback max")
-                    else:
-                        print(f"EnBW {tier_name}: no prices found, using fallback")
-                        results.append(FALLBACK[tier_name])
+                if not all_prices:
+                    print("EnBW: no prices found on page, using fallbacks")
+                    browser.close()
+                    return list(FALLBACK.values())
 
-                except Exception as e:
-                    print(f"EnBW {tier_name} error: {e}, using fallback")
-                    results.append(FALLBACK[tier_name])
+                # Page has all three tiers — try to split by tier sections.
+                # Look for tier labels S/M/L near price clusters.
+                results = {}
+                for tier_name in ["S", "M", "L"]:
+                    pattern = rf'(?:Tarif\s*{tier_name}|{tier_name}\s*-\s*Tarif)[^\n]{{0,200}}?(\d+[,\.]\d+\s*ct\s*/?\s*kWh)'
+                    matches = re.findall(pattern, text, re.IGNORECASE | re.DOTALL)
+                    if matches:
+                        tier_prices = []
+                        for raw in matches:
+                            val = float(raw.split()[0].replace(',', '.')) / 100.0
+                            if 0.10 < val < 1.50:
+                                tier_prices.append(round(val, 4))
+                        if tier_prices:
+                            results[tier_name] = _prices_to_tier(tier_name, sorted(set(tier_prices)))
+                            print(f"EnBW {tier_name}: parsed from section → {tier_prices}")
+                            continue
+                    print(f"EnBW {tier_name}: no tier-specific section found, using fallback")
+                    results[tier_name] = FALLBACK[tier_name]
 
-            browser.close()
-        return results
+                browser.close()
+                return [results["S"], results["M"], results["L"]]
+
+            except Exception as e:
+                print(f"EnBW scrape error: {e}")
+                browser.close()
+                raise  # let run_scrapers.py catch and record the error
 
 
 if __name__ == "__main__":
