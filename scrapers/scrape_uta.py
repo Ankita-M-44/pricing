@@ -1,14 +1,13 @@
 """
 Scraper for UTA fleet charging pricing.
-Target: https://www.uta.com/de-de/loesungen/elektromobilitaet
+Target: https://www.uta.com/de/produkte/elektromobilitaet
 """
 import re
-from playwright.sync_api import sync_playwright
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
+from browser import fetch_text
 
 FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.42), PricePoint(0.52, 0.76, 0.62))
-# Verified tariff source (PDF): https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf
-TARGET_URL = "https://www.uta.com/de-de/loesungen/elektromobilitaet"
+TARGET_URL = "https://www.uta.com/de/produkte/elektromobilitaet"
 
 
 def _extract_kwh_prices(text: str) -> list[float]:
@@ -27,43 +26,24 @@ class UTAScraper(BaseScraper):
     provider_name = "UTA"
 
     def scrape(self) -> list[TierPrice]:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            try:
-                page.goto(TARGET_URL, timeout=40000, wait_until="networkidle")
-                for sel in ["button[id*='cookie']", "button[class*='accept']",
-                            "#onetrust-accept-btn-handler"]:
-                    try:
-                        page.click(sel, timeout=2000)
-                        page.wait_for_timeout(800)
-                        break
-                    except Exception:
-                        pass
+        text = fetch_text(TARGET_URL)
+        prices = _extract_kwh_prices(text)
+        print(f"UTA: found prices: {prices}")
 
-                text = page.inner_text("body")
-                prices = _extract_kwh_prices(text)
-                print(f"UTA: found prices on page: {prices}")
-                print(f"UTA: page text sample:\n{text[:600]}")
+        if len(prices) >= 2:
+            ac, dc = prices[0], prices[-1]
+            return [TierPrice(None,
+                PricePoint(min(ac, FALLBACK.ac.min), max(ac, FALLBACK.ac.max), ac),
+                PricePoint(min(dc, FALLBACK.dc.min), max(dc, FALLBACK.dc.max), dc),
+            )]
+        elif len(prices) == 1:
+            v = prices[0]
+            return [TierPrice(None,
+                PricePoint(FALLBACK.ac.min, FALLBACK.ac.max, v),
+                PricePoint(FALLBACK.dc.min, FALLBACK.dc.max, v),
+            )]
 
-                if len(prices) >= 2:
-                    ac, dc = prices[0], prices[-1]
-                    return [TierPrice(None,
-                        PricePoint(min(ac, FALLBACK.ac.min), max(ac, FALLBACK.ac.max), ac),
-                        PricePoint(min(dc, FALLBACK.dc.min), max(dc, FALLBACK.dc.max), dc),
-                    )]
-                elif len(prices) == 1:
-                    v = prices[0]
-                    return [TierPrice(None,
-                        PricePoint(FALLBACK.ac.min, FALLBACK.ac.max, v),
-                        PricePoint(FALLBACK.dc.min, FALLBACK.dc.max, v),
-                    )]
-            except Exception as e:
-                print(f"UTA scrape error: {e}")
-            finally:
-                browser.close()
-
-        print("UTA: using fallback")
+        print("UTA: no prices found, using fallback")
         return [FALLBACK]
 
 

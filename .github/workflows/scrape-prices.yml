@@ -30,6 +30,8 @@ jobs:
           playwright install chromium --with-deps
 
       - name: Run scrapers
+        env:
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
         run: |
           cd scrapers
           python run_scrapers.py
