@@ -1,11 +1,51 @@
 {
-  "lastUpdated": "2026-08-05T13:28:10.229895+00:00",
+  "lastUpdated": "2026-08-15T06:34:05.774901+00:00",
   "providers": [
     {
       "id": "enbw",
       "name": "EnBW",
       "isElli": false,
-      "sourceUrl": "https://www.enbw.com/elektromobilitaet/produkte/laden-unterwegs/flottenprodukte/",
+      "tiers": [
+        {
+          "tier": "S",
+          "ac": {
+            "min": 0.51,
+            "max": 0.89,
+            "median": 0.56
+          },
+          "dc": {
+            "min": 0.51,
+            "max": 0.89,
+            "median": 0.56
+          }
+        },
+        {
+          "tier": "M",
+          "ac": {
+            "min": 0.41,
+            "max": 0.89,
+            "median": 0.46
+          },
+          "dc": {
+            "min": 0.41,
+            "max": 0.89,
+            "median": 0.46
+          }
+        },
+        {
+          "tier": "L",
+          "ac": {
+            "min": 0.34,
+            "max": 0.89,
+            "median": 0.39
+          },
+          "dc": {
+            "min": 0.34,
+            "max": 0.89,
+            "median": 0.39
+          }
+        }
+      ],
       "blockingFees": {
         "ac": {
           "rate": 0.1,
@@ -32,125 +72,7 @@
           "amount": 11.99
         }
       ],
-      "tiers": [
-        {
-          "tier": "S",
-          "ac": {
-            "min": 0.51,
-            "max": 0.89,
-            "median": 0.56
-          },
-          "dc": {
-            "min": 0.51,
-            "max": 0.89,
-            "median": 0.56
-          },
-          "packet": [
-            {
-              "label": "EnBW-Ladestationen",
-              "value": "56 ct/kWh"
-            },
-            {
-              "label": "Im Aktionszeitraum (bis 30.09.2026)",
-              "value": "51 ct/kWh"
-            },
-            {
-              "label": "Andere Betreiber",
-              "value": "ab 56 · max. 89 ct/kWh"
-            },
-            {
-              "label": "Monatliche Grundgebühr",
-              "value": "0 €"
-            },
-            {
-              "label": "Erste Ladekarte",
-              "value": "9,90 €"
-            },
-            {
-              "label": "Blockiergebühr (> 4 h)",
-              "value": "10 ct/min · max. 12,00 €"
-            }
-          ]
-        },
-        {
-          "tier": "M",
-          "ac": {
-            "min": 0.41,
-            "max": 0.89,
-            "median": 0.46
-          },
-          "dc": {
-            "min": 0.41,
-            "max": 0.89,
-            "median": 0.46
-          },
-          "packet": [
-            {
-              "label": "EnBW-Ladestationen",
-              "value": "46 ct/kWh"
-            },
-            {
-              "label": "Im Aktionszeitraum (bis 30.09.2026)",
-              "value": "41 ct/kWh"
-            },
-            {
-              "label": "Andere Betreiber",
-              "value": "ab 56 · max. 89 ct/kWh"
-            },
-            {
-              "label": "Monatliche Grundgebühr",
-              "value": "5,99 €"
-            },
-            {
-              "label": "Erste Ladekarte (optional)",
-              "value": "9,90 € kostenlos"
-            },
-            {
-              "label": "Blockiergebühr (> 4 h)",
-              "value": "10 ct/min · max. 12,00 €"
-            }
-          ]
-        },
-        {
-          "tier": "L",
-          "ac": {
-            "min": 0.34,
-            "max": 0.89,
-            "median": 0.39
-          },
-          "dc": {
-            "min": 0.34,
-            "max": 0.89,
-            "median": 0.39
-          },
-          "packet": [
-            {
-              "label": "EnBW-Ladestationen",
-              "value": "39 ct/kWh"
-            },
-            {
-              "label": "Im Aktionszeitraum (bis 30.09.2026)",
-              "value": "34 ct/kWh"
-            },
-            {
-              "label": "Andere Betreiber",
-              "value": "ab 56 · max. 89 ct/kWh"
-            },
-            {
-              "label": "Monatliche Grundgebühr",
-              "value": "11,99 €"
-            },
-            {
-              "label": "Erste Ladekarte (optional)",
-              "value": "9,90 € kostenlos"
-            },
-            {
-              "label": "Blockiergebühr (> 4 h)",
-              "value": "10 ct/min · max. 12,00 €"
-            }
-          ]
-        }
-      ]
+      "sourceUrl": "https://www.enbw.com/elektromobilitaet/produkte/laden-unterwegs/flottenprodukte/"
     },
     {
       "id": "dkv",
@@ -219,7 +141,36 @@
       "id": "uta",
       "name": "UTA",
       "isElli": false,
-      "sourceUrl": "https://www.uta.com/de/produkte/elektromobilitaet",
+      "tiers": [
+        {
+          "tier": null,
+          "ac": {
+            "min": 0.28,
+            "max": 0.69,
+            "median": 0.42
+          },
+          "dc": {
+            "min": 0.52,
+            "max": 0.76,
+            "median": 0.62
+          }
+        }
+      ],
+      "blockingFees": {
+        "ac": {
+          "rate": 0.1,
+          "graceMins": 210
+        },
+        "dc": {
+          "rate": 0.12,
+          "graceMins": 60
+        }
+      },
+      "baseFees": [
+        {
+          "amount": 2.0
+        }
+      ],
       "packet": [
         {
           "label": "AC-Ladung",
@@ -242,42 +193,43 @@
           "value": "2,00 € / Monat"
         }
       ],
-      "blockingFees": {
-        "ac": {
-          "rate": 0.1,
-          "graceMins": 210
-        },
-        "dc": {
-          "rate": 0.12,
-          "graceMins": 60
-        }
-      },
-      "baseFees": [
-        {
-          "amount": 2.0
-        }
-      ],
-      "tiers": [
-        {
-          "tier": null,
-          "ac": {
-            "min": 0.28,
-            "max": 0.69,
-            "median": 0.42
-          },
-          "dc": {
-            "min": 0.52,
-            "max": 0.76,
-            "median": 0.62
-          }
-        }
-      ]
+      "sourceUrl": "https://www.uta.com/de/produkte/elektromobilitaet"
     },
     {
       "id": "shell",
       "name": "Shell",
       "isElli": false,
-      "sourceUrl": "https://www.shell.de/fahrer/shellrecharge-loesungen/flotten.html",
+      "tiers": [
+        {
+          "tier": null,
+          "ac": {
+            "min": 0.59,
+            "max": 0.65,
+            "median": 0.62
+          },
+          "dc": {
+            "min": 0.59,
+            "max": 0.65,
+            "median": 0.61
+          }
+        }
+      ],
+      "blockingFees": {
+        "ac": {
+          "rate": 0,
+          "graceMins": 0,
+          "exempt": true
+        },
+        "dc": {
+          "rate": 0.15,
+          "graceMins": 60
+        }
+      },
+      "baseFees": [
+        {
+          "amount": 1.75
+        }
+      ],
       "packet": [
         {
           "label": "AC-Ladung",
@@ -300,37 +252,7 @@
           "value": "1,75 € / Monat"
         }
       ],
-      "blockingFees": {
-        "ac": {
-          "rate": 0,
-          "graceMins": 0,
-          "exempt": true
-        },
-        "dc": {
-          "rate": 0.15,
-          "graceMins": 60
-        }
-      },
-      "baseFees": [
-        {
-          "amount": 1.75
-        }
-      ],
-      "tiers": [
-        {
-          "tier": null,
-          "ac": {
-            "min": 0.59,
-            "max": 0.65,
-            "median": 0.62
-          },
-          "dc": {
-            "min": 0.59,
-            "max": 0.65,
-            "median": 0.61
-          }
-        }
-      ]
+      "sourceUrl": "https://www.shell.de/fahrer/shellrecharge-loesungen/flotten.html"
     },
     {
       "id": "aral",
@@ -928,12 +850,140 @@
           ]
         }
       ]
+    },
+    {
+      "date": "2026-08-15T06:34:05.774888+00:00",
+      "providers": [
+        {
+          "id": "enbw",
+          "name": "EnBW",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": "S",
+              "ac": {
+                "min": 0.51,
+                "max": 0.89,
+                "median": 0.56
+              },
+              "dc": {
+                "min": 0.51,
+                "max": 0.89,
+                "median": 0.56
+              }
+            },
+            {
+              "tier": "M",
+              "ac": {
+                "min": 0.41,
+                "max": 0.89,
+                "median": 0.46
+              },
+              "dc": {
+                "min": 0.41,
+                "max": 0.89,
+                "median": 0.46
+              }
+            },
+            {
+              "tier": "L",
+              "ac": {
+                "min": 0.34,
+                "max": 0.89,
+                "median": 0.39
+              },
+              "dc": {
+                "min": 0.34,
+                "max": 0.89,
+                "median": 0.39
+              }
+            }
+          ]
+        },
+        {
+          "id": "dkv",
+          "name": "DKV",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.28,
+                "max": 0.65,
+                "median": 0.38
+              },
+              "dc": {
+                "min": 0.52,
+                "max": 0.69,
+                "median": 0.58
+              }
+            }
+          ]
+        },
+        {
+          "id": "uta",
+          "name": "UTA",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.28,
+                "max": 0.69,
+                "median": 0.42
+              },
+              "dc": {
+                "min": 0.52,
+                "max": 0.76,
+                "median": 0.62
+              }
+            }
+          ]
+        },
+        {
+          "id": "shell",
+          "name": "Shell",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.59,
+                "max": 0.65,
+                "median": 0.62
+              },
+              "dc": {
+                "min": 0.59,
+                "max": 0.65,
+                "median": 0.61
+              }
+            }
+          ]
+        },
+        {
+          "id": "aral",
+          "name": "Aral pulse",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.41,
+                "max": 0.68,
+                "median": 0.41
+              },
+              "dc": {
+                "min": 0.49,
+                "max": 0.79,
+                "median": 0.79
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "scraperErrors": [
-    "EnBW",
-    "DKV",
-    "UTA",
-    "Shell"
+    "DKV"
   ]
 }
