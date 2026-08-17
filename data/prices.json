@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-17T12:05:54.826256+00:00",
+  "lastUpdated": "2026-08-17T12:13:52.799409+00:00",
   "providers": [
     {
       "id": "enbw",
@@ -78,7 +78,37 @@
       "id": "dkv",
       "name": "DKV",
       "isElli": false,
-      "sourceUrl": "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road",
+      "tiers": [
+        {
+          "tier": null,
+          "ac": {
+            "min": 0.28,
+            "max": 0.65,
+            "median": 0.28
+          },
+          "dc": {
+            "min": 0.52,
+            "max": 0.78,
+            "median": 0.78
+          }
+        }
+      ],
+      "blockingFees": {
+        "ac": {
+          "rate": 0.1,
+          "graceMins": 210,
+          "note": "Daytime (06–18h) · night rate 0,02 €/min"
+        },
+        "dc": {
+          "rate": 0.1,
+          "graceMins": 45
+        }
+      },
+      "baseFees": [
+        {
+          "amount": 1.5
+        }
+      ],
       "packet": [
         {
           "label": "AC-Ladung",
@@ -105,37 +135,7 @@
           "value": "1,50 € / Monat"
         }
       ],
-      "blockingFees": {
-        "ac": {
-          "rate": 0.1,
-          "graceMins": 210,
-          "note": "Daytime (06–18h) · night rate 0,02 €/min"
-        },
-        "dc": {
-          "rate": 0.1,
-          "graceMins": 45
-        }
-      },
-      "baseFees": [
-        {
-          "amount": 1.5
-        }
-      ],
-      "tiers": [
-        {
-          "tier": null,
-          "ac": {
-            "min": 0.28,
-            "max": 0.65,
-            "median": 0.38
-          },
-          "dc": {
-            "min": 0.52,
-            "max": 0.69,
-            "median": 0.58
-          }
-        }
-      ]
+      "sourceUrl": "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road"
     },
     {
       "id": "uta",
@@ -1374,9 +1374,138 @@
           ]
         }
       ]
+    },
+    {
+      "date": "2026-08-17T12:13:52.799398+00:00",
+      "providers": [
+        {
+          "id": "enbw",
+          "name": "EnBW",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": "S",
+              "ac": {
+                "min": 0.51,
+                "max": 0.89,
+                "median": 0.56
+              },
+              "dc": {
+                "min": 0.51,
+                "max": 0.89,
+                "median": 0.56
+              }
+            },
+            {
+              "tier": "M",
+              "ac": {
+                "min": 0.41,
+                "max": 0.89,
+                "median": 0.46
+              },
+              "dc": {
+                "min": 0.41,
+                "max": 0.89,
+                "median": 0.46
+              }
+            },
+            {
+              "tier": "L",
+              "ac": {
+                "min": 0.34,
+                "max": 0.89,
+                "median": 0.39
+              },
+              "dc": {
+                "min": 0.34,
+                "max": 0.89,
+                "median": 0.39
+              }
+            }
+          ]
+        },
+        {
+          "id": "dkv",
+          "name": "DKV",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.28,
+                "max": 0.65,
+                "median": 0.28
+              },
+              "dc": {
+                "min": 0.52,
+                "max": 0.78,
+                "median": 0.78
+              }
+            }
+          ]
+        },
+        {
+          "id": "uta",
+          "name": "UTA",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.28,
+                "max": 0.69,
+                "median": 0.42
+              },
+              "dc": {
+                "min": 0.46,
+                "max": 0.76,
+                "median": 0.62
+              }
+            }
+          ]
+        },
+        {
+          "id": "shell",
+          "name": "Shell",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.44,
+                "max": 0.64,
+                "median": 0.44
+              },
+              "dc": {
+                "min": 0.44,
+                "max": 0.84,
+                "median": 0.84
+              }
+            }
+          ]
+        },
+        {
+          "id": "aral",
+          "name": "Aral pulse",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.41,
+                "max": 0.68,
+                "median": 0.41
+              },
+              "dc": {
+                "min": 0.49,
+                "max": 0.79,
+                "median": 0.79
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
-  "scraperErrors": [
-    "DKV"
-  ]
+  "scraperErrors": []
 }
