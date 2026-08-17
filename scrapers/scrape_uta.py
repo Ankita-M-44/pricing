@@ -12,6 +12,31 @@ PDF_URL = "https://web.uta.com/hubfs/Documents/Tariff-lists/Tariff-lists-eCharge
 TARGET_URL = "https://web.uta.com/en/charging/ev-charging-card"
 
 
+_OTHER_COUNTRIES = re.compile(
+    r'(?:^|\n)[ \t]*(?:##?\s*)?'
+    r'(?:Austria|Österreich|Belgium|Belgique|France|Luxembourg|Netherlands|Nederland|'
+    r'Poland|Polen|Spain|Spanien|Switzerland|Schweiz|Sweden|Sverige|Norway|Norge|'
+    r'Denmark|Danmark|Finland|Italy|Italien|Czech|Portugal|United Kingdom|UK\b)',
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def _slice_de_section(text: str) -> str:
+    """Return only the Germany / Deutschland portion of a multi-country tariff PDF."""
+    de_match = re.search(
+        r'(?:^|\n)[ \t]*(?:##?\s*)?(?:Germany|Deutschland|DE\b)',
+        text, re.IGNORECASE | re.MULTILINE,
+    )
+    if not de_match:
+        return text
+    start = de_match.start()
+    end_match = _OTHER_COUNTRIES.search(text, start + 10)
+    end = end_match.start() if end_match else len(text)
+    de_slice = text[start:end]
+    print(f"UTA: DE section {len(de_slice)} chars (offset {start}–{end})")
+    return de_slice
+
+
 def _extract_kwh_prices(text: str) -> list[float]:
     prices = []
     for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh',
@@ -62,7 +87,7 @@ class UTAScraper(BaseScraper):
         except Exception as e:
             print(f"UTA: PDF fetch failed ({e}), falling back to web page")
             text = fetch_text(TARGET_URL)
-        prices = _extract_kwh_prices(text)
+        prices = _extract_kwh_prices(_slice_de_section(text))
         print(f"UTA: found prices: {prices}")
 
         if len(prices) >= 2:
