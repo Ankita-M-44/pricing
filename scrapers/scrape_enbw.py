@@ -76,6 +76,11 @@ class EnBWScraper(BaseScraper):
 
         if not all_prices:
             print("EnBW: no prices found, using fallbacks")
+            kwh_idx = text.lower().find('kwh')
+            if kwh_idx >= 0:
+                print(f"EnBW kWh context: ...{text[max(0,kwh_idx-150):kwh_idx+150]}...")
+            else:
+                print(f"EnBW sample: {text[:800]}")
             return list(FALLBACK.values())
 
         results = {}

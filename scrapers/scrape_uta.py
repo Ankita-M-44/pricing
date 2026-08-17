@@ -28,6 +28,13 @@ class UTAScraper(BaseScraper):
     def scrape(self) -> list[TierPrice]:
         text = fetch_text(TARGET_URL)
         prices = _extract_kwh_prices(text)
+        # Debug: show a sample of the page so we can tune extraction
+        print(f"UTA page length: {len(text)}")
+        kwh_idx = text.lower().find('kwh')
+        if kwh_idx >= 0:
+            print(f"UTA kWh context: ...{text[max(0,kwh_idx-100):kwh_idx+100]}...")
+        else:
+            print(f"UTA sample: {text[:500]}")
         print(f"UTA: found prices: {prices}")
 
         if len(prices) >= 2:

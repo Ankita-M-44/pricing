@@ -28,6 +28,12 @@ class ShellScraper(BaseScraper):
     def scrape(self) -> list[TierPrice]:
         text = fetch_text(TARGET_URL)
         prices = _extract_kwh_prices(text)
+        print(f"Shell page length: {len(text)}")
+        kwh_idx = text.lower().find('kwh')
+        if kwh_idx >= 0:
+            print(f"Shell kWh context: ...{text[max(0,kwh_idx-100):kwh_idx+100]}...")
+        else:
+            print(f"Shell sample: {text[:500]}")
         print(f"Shell: found prices: {prices}")
 
         if len(prices) >= 2:
