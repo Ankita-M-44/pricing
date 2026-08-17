@@ -22,10 +22,11 @@ export default function ElliPricingCard({ provider, theme }: Props) {
       borderRadius: 12,
       padding: '20px 24px',
       minWidth: 220,
+      boxShadow: theme.shadow,
     }}>
       <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>{provider.name}</div>
       <div style={{ fontSize: 12, color: '#00C896', marginBottom: 10 }}>{subtitles[provider.id] ?? ''}</div>
-      <div style={{ fontSize: 22, fontWeight: 700, color: '#A855F7', marginBottom: 14 }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: theme.elliLabel, marginBottom: 14 }}>
         € {provider.monthlyFee.toFixed(2).replace('.', ',')}
         <span style={{ fontSize: 12, fontWeight: 400, color: theme.textMuted, marginLeft: 4 }}>/ card / mo</span>
       </div>

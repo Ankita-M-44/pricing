@@ -31,6 +31,7 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme, lang
     <div style={{
       background: theme.surface,
       borderBottom: `1px solid ${theme.border}`,
+      boxShadow: isDark ? 'none' : '0 1px 8px rgba(107, 95, 168, 0.07)',
       padding: '16px 32px',
       display: 'flex',
       alignItems: 'center',

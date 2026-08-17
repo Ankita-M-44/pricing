@@ -49,7 +49,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
         {/* Labels */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
           {elliRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
+            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.elliLabel, fontWeight: 600, whiteSpace: 'nowrap' }}>
               {row.label}
             </div>
           ))}
@@ -182,12 +182,12 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                 {/* Elli highlight band */}
                 <div style={{
                   position: 'absolute', left: 0, right: 0, top, height: ROW_H,
-                  background: 'rgba(123, 47, 190, 0.10)',
-                  borderTop: ei === 0 ? '1px solid rgba(123, 47, 190, 0.3)' : '1px solid rgba(123, 47, 190, 0.12)',
-                  borderBottom: ei === elliRows.length - 1 ? '1px solid rgba(123, 47, 190, 0.3)' : 'none',
+                  background: 'rgba(123, 47, 190, 0.08)',
+                  borderTop: ei === 0 ? `1px solid ${theme.border}` : `1px solid ${theme.borderSubtle}`,
+                  borderBottom: ei === elliRows.length - 1 ? `1px solid ${theme.border}` : 'none',
                 }} />
                 {/* Grace period label */}
-                <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: '#C084FC', fontStyle: 'italic' }}>
+                <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: theme.elliLabel, fontStyle: 'italic' }}>
                   {fmtGrace(fee.graceMins, lang)}
                 </div>
                 {/* Filled bar */}

@@ -30,7 +30,7 @@ export default function App() {
   const [data, setData] = useState<PricesData | null>(null);
   const [type, setType] = useState<ChargingType>('ac');
   const [blockingSubType, setBlockingSubType] = useState<'ac' | 'dc'>('ac');
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [lang, setLang] = useState<Lang>('en');
 
   const theme = isDark ? dark : light;
@@ -89,10 +89,10 @@ export default function App() {
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             {/* Flex card */}
-            <div style={{ background: theme.surface, border: `1px solid ${theme.borderSubtle}`, borderRadius: 12, padding: '20px 24px', minWidth: 200, opacity: 0.75 }}>
+            <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '20px 24px', minWidth: 200, opacity: 0.75, boxShadow: theme.shadow }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>Elli – Flex</div>
               <div style={{ fontSize: 12, color: '#00C896', marginBottom: 10 }}>{t(lang, 'idealOccasional')}</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#A855F7', marginBottom: 10 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: theme.elliLabel, marginBottom: 10 }}>
                 € 3,50<span style={{ fontSize: 12, fontWeight: 400, color: theme.textMuted, marginLeft: 4 }}>{t(lang, 'perCardMonth')}</span>
               </div>
               <div style={{ fontSize: 12, color: theme.textMuted }}>{t(lang, 'variablePassThrough')}</div>
@@ -102,7 +102,7 @@ export default function App() {
         </div>
 
         {/* Benchmark chart */}
-        <div style={{ background: theme.surface, borderRadius: 14, border: `1px solid ${theme.border}`, padding: '36px 32px 28px', marginBottom: 24 }}>
+        <div style={{ background: theme.surface, borderRadius: 14, border: `1px solid ${theme.border}`, padding: '36px 32px 28px', marginBottom: 24, boxShadow: theme.shadow }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: theme.text }}>{t(lang, 'chartTitle')}</div>

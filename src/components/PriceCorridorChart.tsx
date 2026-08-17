@@ -79,7 +79,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
         {/* Labels column */}
         <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
           {elliProviders.map(p => (
-            <div key={p.id} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: '#C084FC', fontWeight: 600, whiteSpace: 'nowrap' }}>
+            <div key={p.id} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.elliLabel, fontWeight: 600, whiteSpace: 'nowrap' }}>
               {p.name}
             </div>
           ))}
@@ -158,9 +158,9 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
               <div key={p.id}>
                 <div style={{
                   position: 'absolute', left: 0, right: 0, top, height: ROW_H,
-                  background: 'rgba(123, 47, 190, 0.10)',
-                  borderTop: ei === 0 ? '1px solid rgba(123, 47, 190, 0.3)' : '1px solid rgba(123, 47, 190, 0.12)',
-                  borderBottom: ei === elliProviders.length - 1 ? '1px solid rgba(123, 47, 190, 0.3)' : 'none',
+                  background: 'rgba(123, 47, 190, 0.08)',
+                  borderTop: ei === 0 ? `1px solid ${theme.border}` : `1px solid ${theme.borderSubtle}`,
+                  borderBottom: ei === elliProviders.length - 1 ? `1px solid ${theme.border}` : 'none',
                 }} />
                 {markers.map((m, mi) => (
                   <div key={mi}>
