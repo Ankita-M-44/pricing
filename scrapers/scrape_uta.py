@@ -20,7 +20,7 @@ def _extract_kwh_prices(text: str) -> list[float]:
             val = parse_euro(m.group(0))
             if val and 0.10 < val < 1.50:
                 prices.append(round(val, 4))
-    # Also handle ct/kWh format (common on German sites)
+    # ct/kWh format
     for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
         raw = m.group(1).replace(',', '.')
         try:
@@ -29,6 +29,24 @@ def _extract_kwh_prices(text: str) -> list[float]:
                 prices.append(round(val, 4))
         except ValueError:
             pass
+    # UTA PDF format: Firecrawl renders table prices without adjacent units.
+    # Three patterns cover all observed cases in the markdown:
+    #   "(€/kWh)0,52"  — price immediately after column header
+    #   "Ubitricity0,46 |" — price at end of operator name before pipe
+    #   "0,76Operators" — price immediately before "Operators" keyword
+    for pat in [
+        r'\(€/kWh\)(\d+[,\.]\d+)',
+        r'(?<=[A-Za-zäöüÄÖÜß.,+])(\d+[,\.]\d+)(?=\s*\|)',
+        r'(\d+[,\.]\d+)(?=Operators\b)',
+    ]:
+        for m in re.finditer(pat, text, re.IGNORECASE):
+            raw = m.group(1).replace(',', '.')
+            try:
+                val = float(raw)
+                if 0.10 < val < 1.50:
+                    prices.append(round(val, 4))
+            except ValueError:
+                pass
     return sorted(set(prices))
 
 
@@ -44,7 +62,6 @@ class UTAScraper(BaseScraper):
         except Exception as e:
             print(f"UTA: PDF fetch failed ({e}), falling back to web page")
             text = fetch_text(TARGET_URL)
-        print(f"UTA: PDF sample: {repr(text[:800])}")
         prices = _extract_kwh_prices(text)
         print(f"UTA: found prices: {prices}")
 
