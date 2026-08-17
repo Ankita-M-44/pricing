@@ -78,7 +78,7 @@
       "id": "dkv",
       "name": "DKV",
       "isElli": false,
-      "sourceUrl": "https://www.dkv-mobility.com/de/loesungen/elektromobilitaet/",
+      "sourceUrl": "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road",
       "packet": [
         {
           "label": "AC-Ladung",
@@ -193,7 +193,7 @@
           "value": "2,00 € / Monat"
         }
       ],
-      "sourceUrl": "https://web.uta.com/en/charging/ev-charging-card"
+      "sourceUrl": "https://web.uta.com/hubfs/Documents/Tariff-lists/Tariff-lists-eCharge/UTA_eCharge_ChargingTariff_EN.pdf"
     },
     {
       "id": "shell",

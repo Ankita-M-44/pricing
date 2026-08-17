@@ -97,6 +97,21 @@ def _dismiss_cookies(page: Page) -> None:
             pass
 
 
+def fetch_pdf(url: str) -> str:
+    """
+    Fetch text from a PDF URL via Firecrawl (Playwright cannot render PDFs).
+    Raises RuntimeError if FIRECRAWL_API_KEY is not set.
+    """
+    if not FIRECRAWL_API_KEY:
+        raise RuntimeError(
+            f"PDF fetch requires FIRECRAWL_API_KEY to be set: {url}"
+        )
+    text = _firecrawl_fetch(url)
+    if not text:
+        raise RuntimeError(f"Firecrawl returned empty content for PDF: {url}")
+    return text
+
+
 def _firecrawl_fetch(url: str) -> str:
     resp = _requests.post(
         "https://api.firecrawl.dev/v1/scrape",

@@ -1,13 +1,14 @@
 """
 Scraper for DKV Mobility fleet charging pricing.
-Target: https://www.dkv-mobility.com/de/loesungen/elektromobilitaet/
+Target: https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road
+(Tarifübersicht für Deutschland section)
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 from browser import fetch_text
 
 FALLBACK = TierPrice(None, PricePoint(0.28, 0.65, 0.38), PricePoint(0.52, 0.69, 0.58))
-TARGET_URL = "https://www.dkv-mobility.com/de/loesungen/elektromobilitaet/"
+TARGET_URL = "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road"
 
 
 def _extract_kwh_prices(text: str) -> list[float]:
@@ -18,6 +19,15 @@ def _extract_kwh_prices(text: str) -> list[float]:
             val = parse_euro(m.group(0))
             if val and 0.10 < val < 1.50:
                 prices.append(round(val, 4))
+    # Also handle ct/kWh format
+    for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
+        raw = m.group(1).replace(',', '.')
+        try:
+            val = float(raw) / 100.0
+            if 0.10 < val < 1.50:
+                prices.append(round(val, 4))
+        except ValueError:
+            pass
     return sorted(set(prices))
 
 

@@ -1,12 +1,14 @@
 """
 Scraper for UTA Edenred fleet EV charging pricing.
-Target: https://web.uta.com/en/charging/ev-charging-card
+Primary: PDF tariff list via Firecrawl (Playwright cannot render PDFs).
+Fallback: web page if PDF fetch fails.
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
-from browser import fetch_text
+from browser import fetch_text, fetch_pdf
 
 FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.42), PricePoint(0.46, 0.76, 0.62))
+PDF_URL = "https://web.uta.com/hubfs/Documents/Tariff-lists/Tariff-lists-eCharge/UTA_eCharge_ChargingTariff_EN.pdf"
 TARGET_URL = "https://web.uta.com/en/charging/ev-charging-card"
 
 
@@ -35,7 +37,13 @@ class UTAScraper(BaseScraper):
     provider_name = "UTA"
 
     def scrape(self) -> list[TierPrice]:
-        text = fetch_text(TARGET_URL)
+        # Try the PDF tariff list first (most complete and structured source)
+        try:
+            text = fetch_pdf(PDF_URL)
+            print(f"UTA: fetched PDF ({len(text)} chars)")
+        except Exception as e:
+            print(f"UTA: PDF fetch failed ({e}), falling back to web page")
+            text = fetch_text(TARGET_URL)
         prices = _extract_kwh_prices(text)
         print(f"UTA: found prices: {prices}")
 
