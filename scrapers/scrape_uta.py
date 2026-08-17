@@ -7,7 +7,7 @@ import re
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 from browser import fetch_text, fetch_pdf
 
-FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.42), PricePoint(0.46, 0.76, 0.62))
+FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.46), PricePoint(0.46, 0.76, 0.76))
 PDF_URL = "https://web.uta.com/hubfs/Documents/Tariff-lists/Tariff-lists-eCharge/UTA_eCharge_ChargingTariff_EN.pdf"
 TARGET_URL = "https://web.uta.com/en/charging/ev-charging-card"
 
@@ -22,7 +22,25 @@ _OTHER_COUNTRIES = re.compile(
 
 
 def _slice_de_section(text: str) -> str:
-    """Return only the Germany / Deutschland portion of a multi-country tariff PDF."""
+    """Return only the 'Public Charging in Germany' summary table, not the per-CPO breakdown."""
+    # Prefer the specific "Public Charging in Germany" heading (the summary tier table)
+    pc_match = re.search(
+        r'(?:^|\n)[ \t]*(?:##?\s*)?Public Charging in Germany',
+        text, re.IGNORECASE | re.MULTILINE,
+    )
+    if pc_match:
+        start = pc_match.start()
+        # End at the next section heading (## / # / blank+uppercase line) or other-country marker
+        end_match = re.search(
+            r'\n(?:#{1,3} |\n[A-Z][A-Za-z ]{3,}\n)',
+            text, pos=start + 10,
+        ) or _OTHER_COUNTRIES.search(text, start + 10)
+        end = end_match.start() if end_match else min(start + 1200, len(text))
+        de_slice = text[start:end]
+        print(f"UTA: 'Public Charging in Germany' slice {len(de_slice)} chars")
+        return de_slice
+
+    # Fallback: full Germany country block
     de_match = re.search(
         r'(?:^|\n)[ \t]*(?:##?\s*)?(?:Germany|Deutschland|DE\b)',
         text, re.IGNORECASE | re.MULTILINE,
