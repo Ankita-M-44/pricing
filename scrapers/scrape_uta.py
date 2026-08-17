@@ -1,13 +1,13 @@
 """
-Scraper for UTA fleet charging pricing.
-Target: https://www.uta.com/de/produkte/elektromobilitaet
+Scraper for UTA Edenred fleet EV charging pricing.
+Target: https://web.uta.com/en/charging/ev-charging-card
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 from browser import fetch_text
 
-FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.42), PricePoint(0.52, 0.76, 0.62))
-TARGET_URL = "https://www.uta.com/de/produkte/elektromobilitaet"
+FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.42), PricePoint(0.46, 0.76, 0.62))
+TARGET_URL = "https://web.uta.com/en/charging/ev-charging-card"
 
 
 def _extract_kwh_prices(text: str) -> list[float]:
@@ -18,6 +18,15 @@ def _extract_kwh_prices(text: str) -> list[float]:
             val = parse_euro(m.group(0))
             if val and 0.10 < val < 1.50:
                 prices.append(round(val, 4))
+    # Also handle ct/kWh format (common on German sites)
+    for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
+        raw = m.group(1).replace(',', '.')
+        try:
+            val = float(raw) / 100.0
+            if 0.10 < val < 1.50:
+                prices.append(round(val, 4))
+        except ValueError:
+            pass
     return sorted(set(prices))
 
 
@@ -28,13 +37,6 @@ class UTAScraper(BaseScraper):
     def scrape(self) -> list[TierPrice]:
         text = fetch_text(TARGET_URL)
         prices = _extract_kwh_prices(text)
-        # Debug: show a sample of the page so we can tune extraction
-        print(f"UTA page length: {len(text)}")
-        kwh_idx = text.lower().find('kwh')
-        if kwh_idx >= 0:
-            print(f"UTA kWh context: ...{text[max(0,kwh_idx-100):kwh_idx+100]}...")
-        else:
-            print(f"UTA sample: {text[:500]}")
         print(f"UTA: found prices: {prices}")
 
         if len(prices) >= 2:

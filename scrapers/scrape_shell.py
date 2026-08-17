@@ -1,13 +1,14 @@
 """
-Scraper for Shell Recharge fleet pricing.
-Target: https://www.shell.de/fahrer/shellrecharge-loesungen/flotten.html
+Scraper for Shell Recharge charging pricing.
+Target: https://www.shell.de/laden/ladetarife-fuer-ihr-elektroauto.html
+Standard rate: 0.64 €/kWh fast charging; e-Deal subscription: 0.44 €/kWh (5.99 €/month).
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
 from browser import fetch_text
 
-FALLBACK = TierPrice(None, PricePoint(0.59, 0.65, 0.62), PricePoint(0.59, 0.65, 0.61))
-TARGET_URL = "https://www.shell.de/fahrer/shellrecharge-loesungen/flotten.html"
+FALLBACK = TierPrice(None, PricePoint(0.44, 0.64, 0.64), PricePoint(0.44, 0.64, 0.64))
+TARGET_URL = "https://www.shell.de/laden/ladetarife-fuer-ihr-elektroauto.html"
 
 
 def _extract_kwh_prices(text: str) -> list[float]:
@@ -18,6 +19,15 @@ def _extract_kwh_prices(text: str) -> list[float]:
             val = parse_euro(m.group(0))
             if val and 0.10 < val < 1.50:
                 prices.append(round(val, 4))
+    # Also handle ct/kWh format
+    for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
+        raw = m.group(1).replace(',', '.')
+        try:
+            val = float(raw) / 100.0
+            if 0.10 < val < 1.50:
+                prices.append(round(val, 4))
+        except ValueError:
+            pass
     return sorted(set(prices))
 
 
@@ -28,12 +38,6 @@ class ShellScraper(BaseScraper):
     def scrape(self) -> list[TierPrice]:
         text = fetch_text(TARGET_URL)
         prices = _extract_kwh_prices(text)
-        print(f"Shell page length: {len(text)}")
-        kwh_idx = text.lower().find('kwh')
-        if kwh_idx >= 0:
-            print(f"Shell kWh context: ...{text[max(0,kwh_idx-100):kwh_idx+100]}...")
-        else:
-            print(f"Shell sample: {text[:500]}")
         print(f"Shell: found prices: {prices}")
 
         if len(prices) >= 2:

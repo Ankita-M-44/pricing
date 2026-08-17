@@ -193,7 +193,7 @@
           "value": "2,00 € / Monat"
         }
       ],
-      "sourceUrl": "https://www.uta.com/de/produkte/elektromobilitaet"
+      "sourceUrl": "https://web.uta.com/en/charging/ev-charging-card"
     },
     {
       "id": "shell",
@@ -252,7 +252,7 @@
           "value": "1,75 € / Monat"
         }
       ],
-      "sourceUrl": "https://www.shell.de/fahrer/shellrecharge-loesungen/flotten.html"
+      "sourceUrl": "https://www.shell.de/laden/ladetarife-fuer-ihr-elektroauto.html"
     },
     {
       "id": "aral",
