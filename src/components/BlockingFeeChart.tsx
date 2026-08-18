@@ -35,16 +35,11 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
 
   const competitorRows = competitors
     .filter(p => p.blockingFees?.[type])
-    .map(p => {
-      const fee = p.blockingFees![type] as BlockingFeePoint;
-      const sub = fee.note ? fee.note : undefined;
-      return { label: p.name, fee, sub };
-    });
+    .map(p => ({ label: p.name, fee: p.blockingFees![type] as BlockingFeePoint }));
 
   const renderRow = (
     key: string,
     label: string,
-    sublabel: string | undefined,
     fee: BlockingFeePoint,
     isElli: boolean,
   ) => {
@@ -97,8 +92,8 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
 
   return (
     <div style={{ width: '100%' }}>
-      {elliRows.map(r => renderRow(`elli-${r.label}`, r.label, undefined, r.fee, true))}
-      {competitorRows.map(r => renderRow(r.label, r.label, r.sub, r.fee, false))}
+      {elliRows.map(r => renderRow(`elli-${r.label}`, r.label, r.fee, true))}
+      {competitorRows.map(r => renderRow(r.label, r.label, r.fee, false))}
 
       <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center', paddingTop: 14, borderTop: `1px solid ${theme.borderSubtle}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
