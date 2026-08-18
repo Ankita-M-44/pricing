@@ -139,6 +139,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
             const midLeft = `${pct((pp.min + pp.max) / 2)}%`;
             const barWidth = `${pct(pp.max) - pct(pp.min)}%`;
             const packet = tier.packet ?? row.provider.packet;
+            const isHovered = hovered?.rowIdx === ri;
 
             return (
               <div
@@ -149,7 +150,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                   borderBottom: ri < rows.length - 1 ? `1px solid ${theme.borderSubtle}` : 'none',
                   position: 'relative',
                 }}
-                onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri, tier: tier.tier })}
+                onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri, tier: tier.tier ?? null })}
                 onMouseLeave={() => setHovered(null)}
               >
                 <div style={{ width: NAME_W, flexShrink: 0, fontSize: 13, fontWeight: 600, color: theme.text, paddingRight: 12, cursor: packet ? 'help' : 'default' }}>
@@ -177,38 +178,35 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                     {fmt(pp.max)}
                   </span>
                 </div>
+
+                {/* Floating tooltip anchored to this row */}
+                {isHovered && packet && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: NAME_W, zIndex: 100,
+                    background: theme.surface, border: `1px solid ${theme.border}`,
+                    borderRadius: 10, padding: '14px 18px', minWidth: 280,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4,
+                    pointerEvents: 'none',
+                  }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
+                      {row.provider.name}{tier.tier ? ` – Tier ${tier.tier}` : ''}
+                    </div>
+                    {packet.map((pr, i) => (
+                      <div key={i} style={{
+                        display: 'flex', justifyContent: 'space-between', gap: 24,
+                        padding: '4px 0', fontSize: 11,
+                        borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
+                      }}>
+                        <span style={{ color: theme.textMuted }}>{pr.label}</span>
+                        <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
-
-        {/* Packet tooltip on hover */}
-        {hovered && (() => {
-          const hoveredTierObj = hovered.provider.tiers.find(t => t.tier === hovered.tier);
-          const packet = hoveredTierObj?.packet ?? hovered.provider.packet;
-          if (!packet) return null;
-          return (
-            <div style={{
-              background: theme.surface, border: `1px solid ${theme.border}`,
-              borderRadius: 10, padding: '14px 18px', minWidth: 280,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 8,
-            }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
-                {hovered.provider.name}{hovered.tier ? ` – Tier ${hovered.tier}` : ''}
-              </div>
-              {packet.map((pr, i) => (
-                <div key={i} style={{
-                  display: 'flex', justifyContent: 'space-between', gap: 24,
-                  padding: '4px 0', fontSize: 11,
-                  borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
-                }}>
-                  <span style={{ color: theme.textMuted }}>{pr.label}</span>
-                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
-                </div>
-              ))}
-            </div>
-          );
-        })()}
 
         {/* Legend */}
         <div style={{

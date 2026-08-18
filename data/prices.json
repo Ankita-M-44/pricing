@@ -8,42 +8,36 @@
       "tiers": [
         {
           "tier": "S",
-          "ac": {
-            "min": 0.51,
-            "max": 0.89,
-            "median": 0.56
-          },
-          "dc": {
-            "min": 0.51,
-            "max": 0.89,
-            "median": 0.56
-          }
+          "ac": { "min": 0.51, "max": 0.89, "median": 0.56 },
+          "dc": { "min": 0.51, "max": 0.89, "median": 0.56 },
+          "packet": [
+            { "label": "Grundgebühr", "value": "0 € / Monat" },
+            { "label": "AC-Ladung", "value": "0,51 – 0,89 €/kWh" },
+            { "label": "DC-Ladung", "value": "0,51 – 0,89 €/kWh" },
+            { "label": "Blockiergebühr AC/DC", "value": "0,10 €/min nach 4h · max 12 €" }
+          ]
         },
         {
           "tier": "M",
-          "ac": {
-            "min": 0.41,
-            "max": 0.89,
-            "median": 0.46
-          },
-          "dc": {
-            "min": 0.41,
-            "max": 0.89,
-            "median": 0.46
-          }
+          "ac": { "min": 0.41, "max": 0.89, "median": 0.46 },
+          "dc": { "min": 0.41, "max": 0.89, "median": 0.46 },
+          "packet": [
+            { "label": "Grundgebühr", "value": "5,99 € / Monat" },
+            { "label": "AC-Ladung", "value": "0,41 – 0,89 €/kWh" },
+            { "label": "DC-Ladung", "value": "0,41 – 0,89 €/kWh" },
+            { "label": "Blockiergebühr AC/DC", "value": "0,10 €/min nach 4h · max 12 €" }
+          ]
         },
         {
           "tier": "L",
-          "ac": {
-            "min": 0.34,
-            "max": 0.89,
-            "median": 0.39
-          },
-          "dc": {
-            "min": 0.34,
-            "max": 0.89,
-            "median": 0.39
-          }
+          "ac": { "min": 0.34, "max": 0.89, "median": 0.39 },
+          "dc": { "min": 0.34, "max": 0.89, "median": 0.39 },
+          "packet": [
+            { "label": "Grundgebühr", "value": "11,99 € / Monat" },
+            { "label": "AC-Ladung", "value": "0,34 – 0,89 €/kWh" },
+            { "label": "DC-Ladung", "value": "0,34 – 0,89 €/kWh" },
+            { "label": "Blockiergebühr AC/DC", "value": "0,10 €/min nach 4h · max 12 €" }
+          ]
         }
       ],
       "blockingFees": {
