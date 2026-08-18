@@ -105,6 +105,7 @@ class UTAScraper(BaseScraper):
         except Exception as e:
             print(f"UTA: PDF fetch failed ({e}), falling back to web page")
             text = fetch_text(TARGET_URL)
+        print(f"UTA: PDF head: {repr(text[:600])}")
         prices = _extract_kwh_prices(_slice_de_section(text))
         print(f"UTA: found prices: {prices}")
 
