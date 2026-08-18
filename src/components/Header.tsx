@@ -22,7 +22,7 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme, lang
   const pillStyle: React.CSSProperties = {
     display: 'flex', alignItems: 'center', gap: 6,
     fontSize: 12, color: theme.textMuted,
-    background: isDark ? 'rgba(139,130,184,0.1)' : 'rgba(123,47,190,0.06)',
+    background: isDark ? 'rgba(155,139,244,0.08)' : 'rgba(105,65,198,0.05)',
     padding: '6px 12px', borderRadius: 20,
     border: `1px solid ${theme.borderSubtle}`,
   };
@@ -47,14 +47,14 @@ export default function Header({ lastUpdated, isDark, onToggleTheme, theme, lang
             display: 'block',
             maxWidth: '60px',
             filter: isDark
-              ? 'invert(1)'
-              : 'invert(31%) sepia(83%) saturate(800%) hue-rotate(255deg) brightness(85%)',
+              ? 'invert(1) brightness(0.85)'
+              : 'invert(28%) sepia(60%) saturate(900%) hue-rotate(240deg) brightness(80%)',
           }}
         />
         <div style={{ width: 1, height: 28, background: theme.border }} />
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: theme.text }}>Pricing Signals Dashboard</div>
-          <div style={{ fontSize: 12, color: '#00C896', fontWeight: 500 }}>Fleet Charging · Benchmark vs. Market</div>
+          <div style={{ fontSize: 12, color: theme.textMuted, fontWeight: 400 }}>Fleet Charging · Benchmark vs. Market</div>
         </div>
       </div>
 

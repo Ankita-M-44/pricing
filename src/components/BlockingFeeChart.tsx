@@ -87,7 +87,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
             }
 
             const barWidth = pct(fee.rate);
-            const barColor = fee.rate >= 0.13 ? '#A83232' : '#6E6890';
+            const barColor = fee.rate >= 0.13 ? '#B42318' : '#98A2B3';
 
             const labelRight = barWidth > 78;
             const stackVertical = row.provider.name === 'Shell' || row.provider.name === 'Aral pulse';
@@ -129,7 +129,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     }}>{t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</div>}
                     {fee.cap == null && fee.rate > 0 && <div style={{
                       position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
-                      fontSize: 9, color: '#A83232', fontWeight: 400, zIndex: 3, textAlign: 'right',
+                      fontSize: 9, color: '#B42318', fontWeight: 400, zIndex: 3, textAlign: 'right',
                     }}>{t(lang, 'noCap')}</div>}
                   </>
                 ) : stackVertical ? (
@@ -146,7 +146,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                     }}>{t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</div>}
                     {fee.cap == null && fee.rate > 0 && <div style={{
                       position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
-                      fontSize: 9, color: '#A83232', fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
+                      fontSize: 9, color: '#B42318', fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
                     }}>{t(lang, 'noCap')}</div>}
                   </>
                 ) : (
@@ -156,7 +156,7 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
                   }}>
                     {fmtRate(fee.rate)}
                     {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · {t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#A83232', fontWeight: 400, fontSize: 9 }}> · {t(lang, 'noCap')}</span>}
+                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#B42318', fontWeight: 400, fontSize: 9 }}> · {t(lang, 'noCap')}</span>}
                   </div>
                 )}
                 {/* Note — just below bar */}
@@ -175,19 +175,19 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
             const mid = top + ROW_H / 2;
             const fee = row.fee;
             const barWidth = pct(fee.rate);
-            const elliColor = '#00C896';
+            const elliColor = '#6941C6';
 
             return (
               <div key={row.label}>
                 {/* Elli highlight band */}
                 <div style={{
                   position: 'absolute', left: 0, right: 0, top, height: ROW_H,
-                  background: 'rgba(123, 47, 190, 0.08)',
+                  background: 'rgba(105, 65, 198, 0.05)',
                   borderTop: ei === 0 ? `1px solid ${theme.border}` : `1px solid ${theme.borderSubtle}`,
                   borderBottom: ei === elliRows.length - 1 ? `1px solid ${theme.border}` : 'none',
                 }} />
                 {/* Grace period label */}
-                <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: theme.elliLabel, fontStyle: 'italic' }}>
+                <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
                   {fmtGrace(fee.graceMins, lang)}
                 </div>
                 {/* Filled bar */}
@@ -228,15 +228,15 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
       {/* Legend */}
       <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#6E6890', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#98A2B3', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorModerate')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#A83232', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#B42318', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorVeryHigh')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#00C896', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#6941C6', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Elli</span>
         </div>
         <div style={{ marginLeft: 'auto', fontSize: 11, color: theme.textMuted, fontStyle: 'italic', opacity: 0.6 }}>

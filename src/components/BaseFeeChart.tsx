@@ -107,7 +107,7 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
             const mid = top + ROW_H / 2;
             return (
               <div key={row.label}>
-                {renderBar(row.amount, mid, '#6E6890', false)}
+                {renderBar(row.amount, mid, '#98A2B3', false)}
                 {row.note && (
                   <div style={{ position: 'absolute', left: 4, top: mid + 10, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
                     {row.note}
@@ -125,11 +125,11 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
               <div key={row.label}>
                 <div style={{
                   position: 'absolute', left: 0, right: 0, top, height: ROW_H,
-                  background: 'rgba(123, 47, 190, 0.08)',
+                  background: 'rgba(105, 65, 198, 0.05)',
                   borderTop: ei === 0 ? `1px solid ${theme.border}` : `1px solid ${theme.borderSubtle}`,
                   borderBottom: ei === elliRows.length - 1 ? `1px solid ${theme.border}` : 'none',
                 }} />
-                {renderBar(row.amount, mid, '#00C896', true)}
+                {renderBar(row.amount, mid, '#6941C6', true)}
               </div>
             );
           })}
@@ -151,11 +151,11 @@ export default function BaseFeeChart({ competitors, elliProviders, theme, lang }
       {/* Legend */}
       <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#6E6890', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#98A2B3', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitor')}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#00C896', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 3, background: '#6941C6', borderRadius: 2 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Elli</span>
         </div>
         <div style={{ marginLeft: 'auto', fontSize: 11, color: theme.textMuted, fontStyle: 'italic', opacity: 0.6 }}>

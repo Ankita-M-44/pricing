@@ -16,15 +16,14 @@ function TabButton({ active, onClick, children, theme }: { active: boolean; onCl
     <button onClick={onClick} style={{
       padding: '8px 24px', borderRadius: 20, border: 'none', cursor: 'pointer',
       fontSize: 13, fontWeight: 600,
-      background: active ? '#7B2FBE' : 'transparent',
-      color: active ? '#F0EEFF' : theme.textMuted,
-      transition: 'all 0.2s',
+      background: active ? '#6941C6' : 'transparent',
+      color: active ? '#FFFFFF' : theme.textMuted,
+      transition: 'all 0.15s',
     }}>
       {children}
     </button>
   );
 }
-
 
 export default function App() {
   const [data, setData] = useState<PricesData | null>(null);
@@ -74,7 +73,6 @@ export default function App() {
         lang={lang} onToggleLang={() => setLang(l => (l === 'en' ? 'de' : 'en'))} onExportPdf={() => window.print()}
       />
 
-      {/* Print-only capture date */}
       <div className="print-only" style={{ padding: '8px 32px', fontSize: 12, color: theme.textMuted }}>
         {t(lang, 'pricingCaptured')}: {new Date(data.lastUpdated).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
       </div>
@@ -82,22 +80,56 @@ export default function App() {
       <div style={{ padding: '24px 32px', maxWidth: 1400, margin: '0 auto' }}>
         <PriceChangeAlert changes={recentChanges} theme={theme} />
 
-        {/* Elli pricing cards */}
-        <div style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
-            {t(lang, 'elliPricingCurrent')}
-          </div>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            {/* Flex card */}
-            <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '20px 24px', minWidth: 200, opacity: 0.75, boxShadow: theme.shadow }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, marginBottom: 2 }}>Elli – Flex</div>
-              <div style={{ fontSize: 12, color: '#00C896', marginBottom: 10 }}>{t(lang, 'idealOccasional')}</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: theme.elliLabel, marginBottom: 10 }}>
-                € 3,50<span style={{ fontSize: 12, fontWeight: 400, color: theme.textMuted, marginLeft: 4 }}>{t(lang, 'perCardMonth')}</span>
-              </div>
-              <div style={{ fontSize: 12, color: theme.textMuted }}>{t(lang, 'variablePassThrough')}</div>
+        {/* Elli pricing cards — centered, max 780px */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
+          <div style={{ width: '100%', maxWidth: 780 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+              {t(lang, 'elliPricingCurrent')}
             </div>
-            {elliProviders.map(p => <ElliPricingCard key={p.id} provider={p} theme={theme} />)}
+            <div style={{ display: 'flex', gap: 12 }}>
+              {/* Flex card */}
+              <div style={{
+                flex: '1 0 0', display: 'flex', flexDirection: 'column',
+                background: theme.surface, border: `1px solid ${theme.border}`,
+                borderRadius: 12, padding: '14px 14px 16px',
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: theme.text, marginBottom: 2 }}>Elli – Flex</div>
+                <div style={{ fontSize: 11, color: '#667085', marginBottom: 10 }}>{t(lang, 'idealOccasional')}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: theme.elliLabel, marginBottom: 10 }}>
+                  € 3,50<span style={{ fontSize: 11, fontWeight: 400, color: theme.textMuted, marginLeft: 4 }}>{t(lang, 'perCardMonth')}</span>
+                </div>
+                <div style={{ position: 'relative', background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '16px 10px 9px', marginBottom: 9 }}>
+                  <span style={{
+                    position: 'absolute', top: 0, left: '50%', transform: 'translate(-50%,-50%)',
+                    display: 'inline-block', background: '#00FF99', color: '#101828',
+                    fontSize: 9.5, fontWeight: 700, padding: '2px 10px', borderRadius: 20,
+                    letterSpacing: '0.03em', whiteSpace: 'nowrap',
+                  }}>
+                    TARIFF HIGHLIGHTS
+                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 11, color: theme.textMuted }}>IONITY / Aral pulse</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: theme.text, whiteSpace: 'nowrap' }}>0,59 €/kWh</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Charging Fees</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 11, color: theme.textMuted }}>AC charging stations</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: theme.textMuted, whiteSpace: 'nowrap' }}>{t(lang, 'variablePassThrough')}</span>
+                  </div>
+                </div>
+              </div>
+
+              {elliProviders.map(p => (
+                <ElliPricingCard
+                  key={p.id}
+                  provider={p}
+                  theme={theme}
+                  isActive={p.id === 'elli-control'}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -107,7 +139,7 @@ export default function App() {
             <div>
               <div style={{ fontSize: 18, fontWeight: 700, color: theme.text }}>{t(lang, 'chartTitle')}</div>
             </div>
-            <div style={{ display: 'flex', background: theme.inputBg, borderRadius: 24, padding: 4, border: `1px solid ${theme.borderSubtle}` }}>
+            <div style={{ display: 'flex', background: theme.inputBg, borderRadius: 24, padding: 4, border: `1px solid ${theme.border}` }}>
               <TabButton active={type === 'ac'} onClick={() => setType('ac')} theme={theme}>AC</TabButton>
               <TabButton active={type === 'dc'} onClick={() => setType('dc')} theme={theme}>DC</TabButton>
               <TabButton active={type === 'blocking'} onClick={() => setType('blocking')} theme={theme}>{t(lang, 'tabBlocking')}</TabButton>
@@ -117,8 +149,26 @@ export default function App() {
           {type === 'blocking' ? (
             <>
               <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-                <button onClick={() => setBlockingSubType('ac')} style={{ padding: '4px 16px', borderRadius: 16, border: `1px solid ${theme.border}`, background: blockingSubType === 'ac' ? theme.border : 'transparent', color: blockingSubType === 'ac' ? theme.text : theme.textMuted, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>AC</button>
-                <button onClick={() => setBlockingSubType('dc')} style={{ padding: '4px 16px', borderRadius: 16, border: `1px solid ${theme.border}`, background: blockingSubType === 'dc' ? theme.border : 'transparent', color: blockingSubType === 'dc' ? theme.text : theme.textMuted, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>DC</button>
+                <button
+                  onClick={() => setBlockingSubType('ac')}
+                  style={{
+                    padding: '4px 16px', borderRadius: 16,
+                    border: `1px solid ${theme.border}`,
+                    background: blockingSubType === 'ac' ? '#6941C6' : 'transparent',
+                    color: blockingSubType === 'ac' ? '#FFFFFF' : theme.textMuted,
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  }}
+                >AC</button>
+                <button
+                  onClick={() => setBlockingSubType('dc')}
+                  style={{
+                    padding: '4px 16px', borderRadius: 16,
+                    border: `1px solid ${theme.border}`,
+                    background: blockingSubType === 'dc' ? '#6941C6' : 'transparent',
+                    color: blockingSubType === 'dc' ? '#FFFFFF' : theme.textMuted,
+                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  }}
+                >DC</button>
               </div>
               <BlockingFeeChart competitors={competitors} elliProviders={elliProviders} type={blockingSubType} theme={theme} lang={lang} />
             </>
