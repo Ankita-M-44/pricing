@@ -14,308 +14,225 @@ interface Props {
 
 const CHART_MIN = 0.20;
 const CHART_MAX = 0.90;
-const LABEL_WIDTH = 148;
-const ROW_H = 38;
+const NAME_W = 144; // matches mockup c-name width
+const CARD_PAD = 32; // chart card's horizontal padding, for bleed effect
 
 function pct(value: number): number {
   return ((value - CHART_MIN) / (CHART_MAX - CHART_MIN)) * 100;
 }
 
 function fmt(v: number): string {
-  return `€ ${v.toFixed(2).replace('.', ',')}`;
+  return v.toFixed(2).replace('.', ',');
 }
 
-interface ElliMarker {
-  value: number;
-  color: string;
-  label: string;
-}
-
-function getElliMarkersForRow(provider: ElliProvider, type: ChargingType): ElliMarker[] {
-  const tier = provider.tiers[0];
-  if (type === 'ac') {
-    return [{ value: tier.ac.price, color: '#6941C6', label: `AC ${fmt(tier.ac.price)}` }];
-  }
-  return [
-    { value: tier.dc.spn,     color: provider.id === 'elli-control' ? '#EC4899' : '#C026D3', label: `SPN ${fmt(tier.dc.spn)}` },
-    { value: tier.dc.general, color: '#6941C6', label: `DC ${fmt(tier.dc.general)}` },
-    { value: tier.dc.enbw,    color: '#F97316', label: `EnBW ${fmt(tier.dc.enbw)}` },
-  ];
-}
-
-function getAllElliLines(elliProviders: ElliProvider[], type: ChargingType) {
-  const seen = new Map<number, { color: string; label: string }>();
-  for (const p of elliProviders) {
-    for (const m of getElliMarkersForRow(p, type)) {
-      if (!seen.has(m.value)) seen.set(m.value, { color: m.color, label: m.label });
-    }
-  }
-  return Array.from(seen.entries()).map(([value, meta]) => ({ value, ...meta }));
-}
-
-const ticks = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90];
+// 5 axis labels evenly spaced: 0.20, 0.38, 0.55, 0.73, 0.90
+const AXIS_LABELS = [0.20, 0.375, 0.55, 0.725, 0.90];
 
 export default function PriceCorridorChart({ competitors, elliProviders, type, theme, lang }: Props) {
-  const overlayLines = getAllElliLines(elliProviders, type);
   const [hovered, setHovered] = useState<{ provider: CompetitorProvider; rowIdx: number; tier: string | null } | null>(null);
 
-  // Elli AC reference line position
-  const elliAcPrice = elliProviders[0]?.tiers[0]?.ac?.price;
-
-  const rows: Array<{ label: string; provider: CompetitorProvider; tierIdx: number }> = [];
+  const rows: Array<{ label: string; sublabel?: string; provider: CompetitorProvider; tierIdx: number }> = [];
   for (const p of competitors) {
-    p.tiers.forEach((_, i) => {
-      const suffix = p.tiers.length > 1 && p.tiers[i].tier ? ` ${p.tiers[i].tier}` : '';
-      rows.push({ label: `${p.name}${suffix}`, provider: p, tierIdx: i });
+    p.tiers.forEach((tier, i) => {
+      const tierLabel = p.tiers.length > 1 && tier.tier ? tier.tier : undefined;
+      rows.push({
+        label: p.name,
+        sublabel: tierLabel ? `Tier ${tierLabel}` : undefined,
+        provider: p,
+        tierIdx: i,
+      });
     });
   }
 
-  const elliHeight = elliProviders.length * ROW_H;
-  const totalHeight = rows.length * ROW_H + elliHeight;
+  // Primary Elli price for reference line
+  const elliRefPrice = type === 'ac'
+    ? elliProviders[0]?.tiers[0]?.ac?.price
+    : elliProviders[0]?.tiers[0]?.dc?.general;
+
+  // Reference line left = NAME_W + pct(price)/100 * (100% - NAME_W)
+  const refLineLeft = elliRefPrice != null
+    ? `calc(${NAME_W}px + ${pct(elliRefPrice) / 100} * (100% - ${NAME_W}px))`
+    : undefined;
 
   return (
-    <div style={{ width: '100%' }}>
-      <div style={{ display: 'flex' }}>
-        {/* Labels column */}
-        <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
-          {elliProviders.map(p => (
-            <div key={p.id} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.elliLabel, fontWeight: 600, whiteSpace: 'nowrap' }}>
-              {p.name}
-            </div>
-          ))}
-          {rows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
-              {row.label}
-            </div>
-          ))}
+    <figure aria-label={`${type.toUpperCase()} charging price corridor comparison`}>
+      <figcaption className="sr-only">
+        Each row shows the min–max price range with a dot at the midpoint. Elli has a fixed price marked with a vertical bar.
+      </figcaption>
+
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {/* Axis — 5 evenly spaced labels at top, offset by NAME_W */}
+        <div style={{ display: 'flex', marginLeft: NAME_W, marginBottom: 8 }} aria-hidden="true">
+          <div style={{ display: 'flex', justifyContent: 'space-between', flex: 1 }}>
+            {AXIS_LABELS.map(v => (
+              <span key={v} style={{ fontSize: 10, color: theme.textMuted, fontVariantNumeric: 'tabular-nums' }}>
+                {fmt(v)}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Chart area */}
-        <div style={{ flex: 1, position: 'relative', height: totalHeight }}>
-          {/* Grid lines */}
-          {ticks.map(tick => (
-            <div key={tick} style={{
-              position: 'absolute', left: `${pct(tick)}%`, top: 0, bottom: 0,
-              width: 1, background: theme.borderSubtle, pointerEvents: 'none',
-            }} />
-          ))}
-
-          {/* Faint reference line at Elli AC price — continuous across all rows */}
-          {type === 'ac' && elliAcPrice != null && (
+        {/* Row container — position:relative for the reference line */}
+        <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          {/* Faint reference line — single element spanning all rows */}
+          {refLineLeft && (
             <div style={{
               position: 'absolute',
-              left: `${pct(elliAcPrice)}%`,
+              left: refLineLeft,
               top: 0, bottom: 0,
               width: 1, background: 'rgba(105,65,198,0.12)',
               transform: 'translateX(-50%)',
               pointerEvents: 'none', zIndex: 1,
-            }} />
+            }} aria-hidden="true" />
           )}
 
-          {/* DC: dashed overlay lines for each Elli price point */}
-          {type === 'dc' && overlayLines.map((line, i) => (
-            <div key={i} style={{
-              position: 'absolute',
-              left: `${pct(line.value)}%`,
-              top: 0,
-              height: totalHeight,
-              width: 0,
-              borderLeft: `2px dashed ${line.color}`,
-              opacity: 0.6,
-              zIndex: 1,
-              pointerEvents: 'none',
-            }} />
-          ))}
+          {/* Elli rows */}
+          {elliProviders.map(p => {
+            const price = type === 'ac' ? p.tiers[0].ac.price : p.tiers[0].dc.general;
+            const shortName = p.name.replace(/^Elli\s+[–-]\s*/, '').replace(/^Elli\s+/, '');
+            const barLeft = `${pct(price)}%`;
+
+            return (
+              <div key={p.id} style={{
+                display: 'flex', alignItems: 'center',
+                background: '#F4F0FF',
+                margin: `0 -${CARD_PAD}px`, padding: `14px ${CARD_PAD}px`,
+                borderTop: '1px solid #D9D6FE',
+                borderBottom: '1px solid #D9D6FE',
+                position: 'relative',
+              }}>
+                <div style={{ width: NAME_W, flexShrink: 0, fontSize: 13, fontWeight: 600, color: '#6941C6', paddingRight: 12 }}>
+                  {`Elli ${shortName}`}
+                  <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>
+                    Your package · fixed
+                  </small>
+                </div>
+                <div style={{ flex: 1, position: 'relative', height: 38 }}>
+                  {/* gray track */}
+                  <div style={{ position: 'absolute', top: 7, left: 0, right: 0, height: 6, borderRadius: 3, background: theme.borderSubtle }} />
+                  {/* vertical bar marker */}
+                  <div style={{
+                    position: 'absolute', top: 2, left: barLeft,
+                    width: 2, height: 16, borderRadius: 1,
+                    background: '#6941C6', transform: 'translateX(-50%)', zIndex: 2,
+                  }} aria-hidden="true" />
+                  {/* label below bar */}
+                  <span style={{
+                    position: 'absolute', top: 20, left: barLeft,
+                    transform: 'translateX(-50%)',
+                    fontSize: 9.5, color: '#6941C6', fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
+                  }}>
+                    {fmt(price)} €/kWh
+                  </span>
+                </div>
+              </div>
+            );
+          })}
 
           {/* Competitor rows */}
           {rows.map((row, ri) => {
             const tier = row.provider.tiers[row.tierIdx];
             const pp = tier[type];
-            const top = elliHeight + ri * ROW_H;
-            const mid = top + ROW_H / 2;
+            const minLeft = `${pct(pp.min)}%`;
+            const maxLeft = `${pct(pp.max)}%`;
+            const midLeft = `${pct((pp.min + pp.max) / 2)}%`;
+            const barWidth = `${pct(pp.max) - pct(pp.min)}%`;
+            const packet = tier.packet ?? row.provider.packet;
 
             return (
-              <div key={row.label}>
-                {/* Hover strip for packet tooltip */}
-                <div
-                  onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri, tier: row.provider.tiers[row.tierIdx].tier })}
-                  onMouseLeave={() => setHovered(null)}
-                  style={{ position: 'absolute', left: 0, right: 0, top, height: ROW_H, zIndex: 4, cursor: (row.provider.tiers[row.tierIdx].packet ?? row.provider.packet) ? 'help' : 'default' }}
-                />
-                {/* Min label at bar start */}
-                <div style={{ position: 'absolute', left: `${pct(pp.min)}%`, top: top + 4, fontSize: 9, color: theme.textMuted, transform: 'translateX(-100%) translateX(-3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
-                  {fmt(pp.min)}
+              <div
+                key={row.label + row.tierIdx}
+                style={{
+                  display: 'flex', alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: ri < rows.length - 1 ? `1px solid ${theme.borderSubtle}` : 'none',
+                  position: 'relative',
+                }}
+                onMouseEnter={() => setHovered({ provider: row.provider, rowIdx: ri, tier: tier.tier })}
+                onMouseLeave={() => setHovered(null)}
+              >
+                <div style={{ width: NAME_W, flexShrink: 0, fontSize: 13, fontWeight: 600, color: theme.text, paddingRight: 12, cursor: packet ? 'help' : 'default' }}>
+                  {row.label}
+                  {row.sublabel && <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>{row.sublabel}</small>}
                 </div>
-                {/* Max label at bar end */}
-                <div style={{ position: 'absolute', left: `${pct(pp.max)}%`, top: top + 4, fontSize: 9, color: theme.textMuted, transform: 'translateX(3px)', whiteSpace: 'nowrap', lineHeight: 1 }}>
-                  {fmt(pp.max)}
+                <div style={{ flex: 1, position: 'relative', height: 38 }}>
+                  {/* gray track */}
+                  <div style={{ position: 'absolute', top: 7, left: 0, right: 0, height: 6, borderRadius: 3, background: theme.borderSubtle }} />
+                  {/* range bar */}
+                  <div style={{ position: 'absolute', top: 7, left: minLeft, width: barWidth, height: 6, borderRadius: 3, background: '#D0D5DD' }} aria-hidden="true" />
+                  {/* midpoint dot */}
+                  <div style={{
+                    position: 'absolute', top: 6, left: midLeft,
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: '#98A2B3', border: `1.5px solid ${theme.surface}`,
+                    transform: 'translateX(-50%)', zIndex: 2,
+                  }} aria-hidden="true" />
+                  {/* min label below bar */}
+                  <span style={{ position: 'absolute', top: 20, left: minLeft, fontSize: 9.5, color: theme.textMuted, transform: 'translateX(-10%)', whiteSpace: 'nowrap', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                    {fmt(pp.min)}
+                  </span>
+                  {/* max label below bar */}
+                  <span style={{ position: 'absolute', top: 20, left: maxLeft, fontSize: 9.5, color: theme.textMuted, transform: 'translateX(-90%)', whiteSpace: 'nowrap', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                    {fmt(pp.max)}
+                  </span>
                 </div>
-                {/* Range bar */}
-                <div style={{
-                  position: 'absolute',
-                  left: `${pct(pp.min)}%`,
-                  width: `${pct(pp.max) - pct(pp.min)}%`,
-                  top: mid - 4,
-                  height: 8,
-                  background: theme.chartBar,
-                  borderRadius: 4,
-                }} />
-                {/* Median dot — small, gray */}
-                <div style={{
-                  position: 'absolute',
-                  left: `${pct((pp.min + pp.max) / 2)}%`,
-                  top: mid - 3,
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: '#98A2B3',
-                  border: `1.5px solid ${theme.surface}`,
-                  transform: 'translateX(-50%)',
-                  zIndex: 2,
-                }} />
               </div>
             );
           })}
-
-          {/* Elli rows */}
-          {elliProviders.map((p, ei) => {
-            const top = ei * ROW_H;
-            const mid = top + ROW_H / 2;
-
-            if (type === 'ac') {
-              const acPrice = p.tiers[0].ac.price;
-              return (
-                <div key={p.id}>
-                  {/* Vertical bar marker */}
-                  <div style={{
-                    position: 'absolute',
-                    left: `${pct(acPrice)}%`,
-                    top: top + 2,
-                    width: 2, height: ROW_H - 4,
-                    borderRadius: 1,
-                    background: '#6941C6',
-                    transform: 'translateX(-50%)',
-                    zIndex: 3,
-                  }} />
-                  {/* Value label */}
-                  <div style={{
-                    position: 'absolute',
-                    left: `calc(${pct(acPrice)}% + 8px)`,
-                    top: mid - 5,
-                    fontSize: 10, color: '#6941C6', fontWeight: 600, whiteSpace: 'nowrap', zIndex: 3,
-                  }}>
-                    {fmt(acPrice)}
-                  </div>
-                </div>
-              );
-            }
-
-            // DC: show triangle markers for each price point
-            const markers = getElliMarkersForRow(p, type);
-            return (
-              <div key={p.id}>
-                <div style={{
-                  position: 'absolute', left: 0, right: 0, top, height: ROW_H,
-                  background: 'rgba(105,65,198,0.05)',
-                  borderTop: ei === 0 ? `1px solid ${theme.border}` : `1px solid ${theme.borderSubtle}`,
-                  borderBottom: ei === elliProviders.length - 1 ? `1px solid ${theme.border}` : 'none',
-                }} />
-                {markers.map((m, mi) => (
-                  <div key={mi}>
-                    <div style={{ position: 'absolute', left: `${pct(m.value)}%`, top: mid - 5, transform: 'translateX(-50%)', zIndex: 3 }}>
-                      <svg width={12} height={10} viewBox="0 0 12 10">
-                        <polygon points="6,0 0,10 12,10" fill={m.color} />
-                      </svg>
-                    </div>
-                    <div style={{ position: 'absolute', left: `calc(${pct(m.value)}% + 8px)`, top: mid - 5, fontSize: 10, color: m.color, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3 }}>
-                      {fmt(m.value)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-
-          {/* Packet tooltip on hover */}
-          {hovered && (() => {
-            const hoveredTierObj = hovered.provider.tiers.find(t => t.tier === hovered.tier);
-            const packet = hoveredTierObj?.packet ?? hovered.provider.packet;
-            if (!packet) return null;
-            return (
-              <div style={{
-                position: 'absolute',
-                left: '50%',
-                top: elliHeight + (hovered.rowIdx + 1) * ROW_H + 4,
-                transform: 'translateX(-50%)',
-                background: theme.surface,
-                border: `1px solid ${theme.border}`,
-                borderRadius: 10,
-                padding: '14px 18px',
-                minWidth: 320,
-                zIndex: 10,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                pointerEvents: 'none',
-              }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
-                  {hovered.provider.name}{hovered.tier ? ` – Tarif ${hovered.tier}` : ''}
-                </div>
-                {packet.map((pr, i) => (
-                  <div key={i} style={{
-                    display: 'flex', justifyContent: 'space-between', gap: 24,
-                    padding: '4px 0', fontSize: 11,
-                    borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
-                  }}>
-                    <span style={{ color: theme.textMuted }}>{pr.label}</span>
-                    <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
-                  </div>
-                ))}
-                {hovered.provider.sourceUrl && (
-                  <div style={{ marginTop: 8, fontSize: 9, color: theme.textMuted, opacity: 0.7, wordBreak: 'break-all' }}>
-                    {tr(lang, 'source')}: {hovered.provider.sourceUrl.replace('https://', '').split('/')[0]}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
         </div>
-      </div>
 
-      {/* X-axis */}
-      <div style={{ display: 'flex', marginTop: 8 }}>
-        <div style={{ width: LABEL_WIDTH, flexShrink: 0 }} />
-        <div style={{ flex: 1, position: 'relative', height: 18 }}>
-          {ticks.map(tick => (
-            <div key={tick} style={{ position: 'absolute', left: `${pct(tick)}%`, fontSize: 10, color: theme.textMuted, transform: 'translateX(-50%)' }}>
-              {fmt(tick)}
+        {/* Packet tooltip on hover */}
+        {hovered && (() => {
+          const hoveredTierObj = hovered.provider.tiers.find(t => t.tier === hovered.tier);
+          const packet = hoveredTierObj?.packet ?? hovered.provider.packet;
+          if (!packet) return null;
+          return (
+            <div style={{
+              background: theme.surface, border: `1px solid ${theme.border}`,
+              borderRadius: 10, padding: '14px 18px', minWidth: 280,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 8,
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
+                {hovered.provider.name}{hovered.tier ? ` – Tier ${hovered.tier}` : ''}
+              </div>
+              {packet.map((pr, i) => (
+                <div key={i} style={{
+                  display: 'flex', justifyContent: 'space-between', gap: 24,
+                  padding: '4px 0', fontSize: 11,
+                  borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
+                }}>
+                  <span style={{ color: theme.textMuted }}>{pr.label}</span>
+                  <span style={{ color: theme.text, fontWeight: 600, whiteSpace: 'nowrap' }}>{pr.value}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          );
+        })()}
 
-      {/* Legend */}
-      <div style={{ marginTop: 16, marginLeft: LABEL_WIDTH, display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 11, color: theme.textMuted, alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 24, height: 6, background: theme.chartBar, borderRadius: 3 }} />
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#98A2B3', flexShrink: 0 }} />
-          {tr(lang, 'competitorCorridor')}
-        </div>
-        {type === 'ac' ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 2, height: 14, background: '#6941C6', borderRadius: 1 }} />
-            Elli AC price
+        {/* Legend */}
+        <div style={{
+          display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center',
+          marginTop: 16, paddingTop: 14, borderTop: `1px solid ${theme.borderSubtle}`,
+        }} role="list" aria-label="Chart legend">
+          <div role="listitem" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: theme.textMuted }}>
+            <div style={{ width: 2, height: 16, background: '#6941C6', borderRadius: 1, flexShrink: 0 }} />
+            Elli price
           </div>
-        ) : (
-          overlayLines.map((line, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <svg width={20} height={10} viewBox="0 0 20 10">
-                <line x1="0" y1="5" x2="20" y2="5" stroke={line.color} strokeWidth="2" strokeDasharray="5,3" />
-              </svg>
-              {line.label}
-            </div>
-          ))
-        )}
-        <div style={{ marginLeft: 'auto', fontStyle: 'italic', opacity: 0.6 }}>{tr(lang, 'allValuesKwh')}</div>
+          <div role="listitem" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: theme.textMuted }}>
+            <div style={{ width: 1, height: 16, background: 'rgba(105,65,198,0.25)', flexShrink: 0 }} />
+            Elli reference line
+          </div>
+          <div role="listitem" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: theme.textMuted }}>
+            <div style={{ width: 20, height: 6, background: '#D0D5DD', borderRadius: 3, flexShrink: 0 }} />
+            {tr(lang, 'competitorCorridor')}
+          </div>
+          <div role="listitem" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: theme.textMuted }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#98A2B3', border: `1.5px solid ${theme.surface}`, flexShrink: 0 }} />
+            Midpoint
+          </div>
+        </div>
       </div>
-    </div>
+    </figure>
   );
 }

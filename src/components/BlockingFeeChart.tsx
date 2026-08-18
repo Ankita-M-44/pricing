@@ -11,236 +11,108 @@ interface Props {
   lang: Lang;
 }
 
-const CHART_MAX = 0.16; // €/min — 16 ct/min ceiling
-const LABEL_WIDTH = 148;
-const ROW_H = 56;
+const CHART_MAX = 0.15;
+const NAME_W = 144;
+const CARD_PAD = 32;
 
-function pct(value: number): number {
-  return (value / CHART_MAX) * 100;
+function barPct(rate: number): number {
+  return Math.min((rate / CHART_MAX) * 100, 100);
 }
 
 function fmtRate(v: number): string {
-  return `${(v * 100).toFixed(0)} ct/min`;
+  return `${(v * 100).toFixed(0).replace('.', ',')} ct/min`;
 }
 
-function fmtGrace(mins: number, lang: Lang): string {
-  const after = t(lang, 'after');
-  if (mins >= 60) return `${after} ${mins / 60}h`;
-  return `${after} ${mins} min`;
+function fmtGrace(mins: number): string {
+  if (mins >= 60) return `After ${mins / 60}h`;
+  return `After ${mins} min`;
 }
-
-const ticks = [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16];
 
 export default function BlockingFeeChart({ competitors, elliProviders, type, theme, lang }: Props) {
-  const competitorRows = competitors
-    .filter(p => p.blockingFees)
-    .map(p => ({ provider: p, fee: p.blockingFees![type] as BlockingFeePoint, isElli: false, label: p.name }));
-
   const elliRows = elliProviders
-    .filter(p => p.blockingFees)
-    .map(p => ({ provider: p, fee: p.blockingFees![type] as BlockingFeePoint, isElli: true, label: p.name }));
+    .filter(p => p.blockingFees?.[type] && !p.blockingFees[type].exempt)
+    .map(p => ({ label: p.name.replace(/^Elli\s+[–-]\s*/, '').replace(/^Elli\s+/, ''), fee: p.blockingFees![type] as BlockingFeePoint, isElli: true }));
 
-  const elliHeight = elliRows.length * ROW_H;
-  const totalHeight = competitorRows.length * ROW_H + elliHeight;
+  const competitorRows = competitors
+    .filter(p => p.blockingFees?.[type])
+    .map(p => {
+      const fee = p.blockingFees![type] as BlockingFeePoint;
+      const sub = fee.note ? fee.note : undefined;
+      return { label: p.name, fee, sub };
+    });
+
+  const renderRow = (
+    key: string,
+    label: string,
+    sublabel: string | undefined,
+    fee: BlockingFeePoint,
+    isElli: boolean,
+  ) => {
+    const color = isElli ? '#6941C6' : '#D0D5DD';
+    const valColor = isElli ? '#6941C6' : theme.text;
+
+    const rowStyle: React.CSSProperties = isElli ? {
+      display: 'flex', alignItems: 'center',
+      background: '#F4F0FF',
+      margin: `0 -${CARD_PAD}px`, padding: `10px ${CARD_PAD}px`,
+      borderTop: '1px solid #D9D6FE', borderBottom: '1px solid #D9D6FE',
+    } : {
+      display: 'flex', alignItems: 'center',
+      padding: '10px 0',
+      borderBottom: `1px solid ${theme.borderSubtle}`,
+    };
+
+    if (fee.exempt) {
+      return (
+        <div key={key} style={rowStyle}>
+          <div style={{ width: NAME_W, flexShrink: 0, fontSize: 13, fontWeight: 600, color: isElli ? '#6941C6' : theme.text, paddingRight: 12 }}>
+            {label}
+            {sublabel && <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>{sublabel}</small>}
+          </div>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1, height: 6, background: theme.borderSubtle, borderRadius: 3, overflow: 'hidden' }} />
+            <span style={{ width: 110, textAlign: 'right', fontSize: 13, fontWeight: 700, color: theme.textMuted, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', fontStyle: 'italic' }}>
+              {t(lang, 'acExempt')}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    const grace = fmtGrace(fee.graceMins);
+    const graceLabel = fee.note ? `${grace} · ${fee.note}` : grace;
+
+    return (
+      <div key={key} style={rowStyle}>
+        <div style={{ width: NAME_W, flexShrink: 0, fontSize: 13, fontWeight: 600, color: isElli ? '#6941C6' : theme.text, paddingRight: 12 }}>
+          {label}
+          <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>{graceLabel}</small>
+        </div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ flex: 1, height: 6, background: theme.borderSubtle, borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ width: `${barPct(fee.rate)}%`, height: '100%', background: color, borderRadius: 3 }} />
+          </div>
+          <span style={{ width: 110, textAlign: 'right', fontSize: 13, fontWeight: 700, color: valColor, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+            {fmtRate(fee.rate)}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ display: 'flex' }}>
-        {/* Labels */}
-        <div style={{ width: LABEL_WIDTH, flexShrink: 0 }}>
-          {elliRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.elliLabel, fontWeight: 600, whiteSpace: 'nowrap' }}>
-              {row.label}
-            </div>
-          ))}
-          {competitorRows.map(row => (
-            <div key={row.label} style={{ height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 12, fontSize: 12, color: theme.textMuted, whiteSpace: 'nowrap' }}>
-              {row.label}
-            </div>
-          ))}
-        </div>
+      {elliRows.map(r => renderRow(`elli-${r.label}`, r.label, undefined, r.fee, true))}
+      {competitorRows.map(r => renderRow(r.label, r.label, r.sub, r.fee, false))}
 
-        {/* Chart area */}
-        <div style={{ flex: 1, position: 'relative', height: totalHeight }}>
-          {/* Grid lines */}
-          {ticks.map(t => (
-            <div key={t} style={{
-              position: 'absolute', left: `${pct(t)}%`, top: 0, bottom: 0,
-              width: 1, background: theme.borderSubtle, pointerEvents: 'none',
-            }} />
-          ))}
-
-          {/* Competitor rows */}
-          {competitorRows.map((row, ri) => {
-            const top = elliHeight + ri * ROW_H;
-            const mid = top + ROW_H / 2;
-            const fee = row.fee;
-
-            if (fee.exempt) {
-              return (
-                <div key={row.label}>
-                  <div style={{ position: 'absolute', left: 8, top: mid - 9, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
-                    {t(lang, 'acExempt')}
-                  </div>
-                </div>
-              );
-            }
-
-            const barWidth = pct(fee.rate);
-            const barColor = fee.rate >= 0.13 ? '#B42318' : '#98A2B3';
-
-            const labelRight = barWidth > 78;
-            const stackVertical = row.provider.name === 'Shell' || row.provider.name === 'Aral pulse';
-            return (
-              <div key={row.label}>
-                {/* Grace period label — above bar */}
-                <div style={{ position: 'absolute', left: 4, top: top + 5, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
-                  {fmtGrace(fee.graceMins, lang)}
-                </div>
-                {/* Bar */}
-                <div style={{
-                  position: 'absolute',
-                  left: 0,
-                  width: `${barWidth}%`,
-                  top: mid - 4,
-                  height: 8,
-                  background: barColor,
-                  borderRadius: 4,
-                  opacity: 0.8,
-                }} />
-                {/* Triangle marker at rate */}
-                <div style={{ position: 'absolute', left: `${barWidth}%`, top: mid - 5, transform: 'translateX(-50%)', zIndex: 3 }}>
-                  <svg width={12} height={10} viewBox="0 0 12 10">
-                    <polygon points="6,0 0,10 12,10" fill={barColor} />
-                  </svg>
-                </div>
-                {/* Rate label — flipped left when bar is wide to avoid overflow */}
-                {labelRight ? (
-                  <>
-                    <div style={{
-                      position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid - 16,
-                      fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3, textAlign: 'right',
-                    }}>
-                      {fmtRate(fee.rate)}
-                    </div>
-                    {fee.cap != null && <div style={{
-                      position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
-                      fontSize: 10, color: theme.textMuted, fontWeight: 400, zIndex: 3, textAlign: 'right',
-                    }}>{t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</div>}
-                    {fee.cap == null && fee.rate > 0 && <div style={{
-                      position: 'absolute', right: `calc(${100 - barWidth}% + 20px)`, top: mid + 8,
-                      fontSize: 9, color: '#B42318', fontWeight: 400, zIndex: 3, textAlign: 'right',
-                    }}>{t(lang, 'noCap')}</div>}
-                  </>
-                ) : stackVertical ? (
-                  <>
-                    <div style={{
-                      position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
-                      fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
-                    }}>
-                      {fmtRate(fee.rate)}
-                    </div>
-                    {fee.cap != null && <div style={{
-                      position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
-                      fontSize: 10, color: theme.textMuted, fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
-                    }}>{t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</div>}
-                    {fee.cap == null && fee.rate > 0 && <div style={{
-                      position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid + 8,
-                      fontSize: 9, color: '#B42318', fontWeight: 400, whiteSpace: 'nowrap', zIndex: 3,
-                    }}>{t(lang, 'noCap')}</div>}
-                  </>
-                ) : (
-                  <div style={{
-                    position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5,
-                    fontSize: 10, color: barColor, whiteSpace: 'nowrap', fontWeight: 600, zIndex: 3,
-                  }}>
-                    {fmtRate(fee.rate)}
-                    {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · {t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                    {fee.cap == null && fee.rate > 0 && <span style={{ color: '#B42318', fontWeight: 400, fontSize: 9 }}> · {t(lang, 'noCap')}</span>}
-                  </div>
-                )}
-                {/* Note — just below bar */}
-                {fee.note && (
-                  <div style={{ position: 'absolute', left: 4, top: mid + 10, fontSize: 9, color: theme.textMuted, opacity: 0.65 }}>
-                    {fee.note}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Elli rows */}
-          {elliRows.map((row, ei) => {
-            const top = ei * ROW_H;
-            const mid = top + ROW_H / 2;
-            const fee = row.fee;
-            const barWidth = pct(fee.rate);
-            const elliColor = '#6941C6';
-
-            return (
-              <div key={row.label}>
-                {/* Elli highlight band */}
-                <div style={{
-                  position: 'absolute', left: 0, right: 0, top, height: ROW_H,
-                  background: 'rgba(105, 65, 198, 0.05)',
-                  borderTop: ei === 0 ? `1px solid ${theme.border}` : `1px solid ${theme.borderSubtle}`,
-                  borderBottom: ei === elliRows.length - 1 ? `1px solid ${theme.border}` : 'none',
-                }} />
-                {/* Grace period label */}
-                <div style={{ position: 'absolute', left: 4, top: top + 4, fontSize: 10, color: theme.textMuted, fontStyle: 'italic' }}>
-                  {fmtGrace(fee.graceMins, lang)}
-                </div>
-                {/* Filled bar */}
-                <div style={{
-                  position: 'absolute', left: 0, width: `${barWidth}%`,
-                  top: mid - 4, height: 8,
-                  background: elliColor, borderRadius: 4, opacity: 0.9, zIndex: 2,
-                }} />
-                {/* Triangle */}
-                <div style={{ position: 'absolute', left: `${barWidth}%`, top: mid - 5, transform: 'translateX(-50%)', zIndex: 3 }}>
-                  <svg width={12} height={10} viewBox="0 0 12 10">
-                    <polygon points="6,0 0,10 12,10" fill={elliColor} />
-                  </svg>
-                </div>
-                {/* Rate label */}
-                <div style={{ position: 'absolute', left: `calc(${barWidth}% + 8px)`, top: mid - 5, fontSize: 10, color: elliColor, whiteSpace: 'nowrap', fontWeight: 700, zIndex: 3 }}>
-                  {fmtRate(fee.rate)}
-                  {fee.cap != null && <span style={{ color: theme.textMuted, fontWeight: 400 }}> · {t(lang, 'max')} € {fee.cap.toFixed(2).replace('.', ',')}</span>}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* X-axis */}
-      <div style={{ display: 'flex', marginTop: 8 }}>
-        <div style={{ width: LABEL_WIDTH, flexShrink: 0 }} />
-        <div style={{ flex: 1, position: 'relative', height: 18 }}>
-          {ticks.map(t => (
-            <div key={t} style={{ position: 'absolute', left: `${pct(t)}%`, fontSize: 10, color: theme.textMuted, transform: 'translateX(-50%)' }}>
-              {t === 0 ? '0' : `${(t * 100).toFixed(0)} ct`}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 20, marginTop: 14, flexWrap: 'wrap', alignItems: 'center', paddingTop: 14, borderTop: `1px solid ${theme.borderSubtle}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#98A2B3', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorModerate')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#B42318', borderRadius: 2 }} />
-          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitorVeryHigh')}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 3, background: '#6941C6', borderRadius: 2 }} />
+          <div style={{ width: 20, height: 6, background: '#6941C6', borderRadius: 3 }} />
           <span style={{ fontSize: 11, color: theme.textMuted }}>Elli</span>
         </div>
-        <div style={{ marginLeft: 'auto', fontSize: 11, color: theme.textMuted, fontStyle: 'italic', opacity: 0.6 }}>
-          {t(lang, 'allRatesMin')}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 20, height: 6, background: '#D0D5DD', borderRadius: 3 }} />
+          <span style={{ fontSize: 11, color: theme.textMuted }}>{t(lang, 'competitor')}</span>
         </div>
       </div>
     </div>
