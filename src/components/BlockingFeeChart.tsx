@@ -64,7 +64,10 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
             {label}
             <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>{t(lang, 'acExempt')}</small>
           </div>
-          <div style={{ flex: 1, height: 6, background: theme.borderSubtle, borderRadius: 3 }} />
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1, height: 6, background: theme.borderSubtle, borderRadius: 3 }} />
+            <span style={{ width: 110, textAlign: 'right', fontSize: 13, fontWeight: 700, color: theme.textMuted }}>—</span>
+          </div>
         </div>
       );
     }
