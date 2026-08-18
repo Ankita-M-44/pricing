@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { CompetitorProvider, ElliProvider, ChargingType } from '../types';
+import type { CompetitorProvider, ElliProvider } from '../types';
 import type { Theme } from '../theme';
 import type { Lang } from '../i18n';
 import { t as tr } from '../i18n';
