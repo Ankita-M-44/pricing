@@ -67,14 +67,9 @@ export default function BlockingFeeChart({ competitors, elliProviders, type, the
         <div key={key} style={rowStyle}>
           <div style={{ width: NAME_W, flexShrink: 0, fontSize: 13, fontWeight: 600, color: isElli ? '#6941C6' : theme.text, paddingRight: 12 }}>
             {label}
-            {sublabel && <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>{sublabel}</small>}
+            <small style={{ display: 'block', fontSize: 11, fontWeight: 400, color: theme.textMuted, marginTop: 2 }}>{t(lang, 'acExempt')}</small>
           </div>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1, height: 6, background: theme.borderSubtle, borderRadius: 3, overflow: 'hidden' }} />
-            <span style={{ width: 110, textAlign: 'right', fontSize: 13, fontWeight: 700, color: theme.textMuted, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', fontStyle: 'italic' }}>
-              {t(lang, 'acExempt')}
-            </span>
-          </div>
+          <div style={{ flex: 1, height: 6, background: theme.borderSubtle, borderRadius: 3 }} />
         </div>
       );
     }
