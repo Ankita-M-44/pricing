@@ -39,6 +39,12 @@ class DKVScraper(BaseScraper):
         text = fetch_text(TARGET_URL)
         prices = _extract_kwh_prices(text)
         print(f"DKV: found prices: {prices}")
+        # TEMP DEBUG (one-off): dump the tariff section to find example operators per tier
+        i = text.find("Tarifübersicht")
+        if i < 0:
+            i = max(0, text.lower().find("kwh") - 1500)
+        print(f"DKV DEBUG page length={len(text)} section start={i}")
+        print(f"DKV DEBUG section: {text[i:i + 9000]!r}")
 
         if len(prices) >= 2:
             ac, dc = prices[0], prices[-1]
