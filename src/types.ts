@@ -73,6 +73,7 @@ export interface BlockingFeePoint {
   graceMins: number;  // free window before fee starts
   cap?: number;       // session cap in €, undefined = no cap
   exempt?: boolean;   // true if charging type is fully exempt (e.g. Shell AC)
+  nightRate?: number; // €/min for sessions started at night (e.g. DKV AC 18–6 h)
   note?: string;      // e.g. day/night rate note
 }
 

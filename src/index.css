@@ -18,10 +18,18 @@ body {
   width: 100%;
 }
 
-/* Print / PDF export */
+/* Print / PDF export: one A4 landscape page per chart view (see PdfReport) */
 .print-only { display: none; }
+@page { size: A4 landscape; margin: 0; }
 @media print {
   .print-only { display: block; }
   .no-print { display: none !important; }
-  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pdf-page {
+    width: 297mm; height: 209mm; overflow: hidden;
+    padding: 7mm 11mm 6mm;
+    display: flex; flex-direction: column; gap: 12px;
+    break-after: page; page-break-after: always;
+  }
+  .pdf-page:last-child { break-after: auto; page-break-after: auto; }
 }

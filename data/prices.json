@@ -231,7 +231,8 @@
         "ac": {
           "rate": 0.1,
           "graceMins": 210,
-          "note": "Daytime (06–18h) · night rate 0,02 €/min"
+          "note": "Daytime (06–18h) · night rate 0,02 €/min",
+          "nightRate": 0.02
         },
         "dc": {
           "rate": 0.1,

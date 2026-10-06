@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import Header from './components/Header';
-import PriceCorridorChart from './components/PriceCorridorChart';
-import BlockingFeeChart from './components/BlockingFeeChart';
-import BaseFeeChart from './components/BaseFeeChart';
+import TariffDotChart from './components/TariffDotChart';
+import PdfReport from './components/PdfReport';
 import ElliPricingCard from './components/ElliPricingCard';
 import PriceChangeAlert from './components/PriceChangeAlert';
 import type { PricesData, ChargingType, CompetitorProvider, ElliProvider } from './types';
 import { light } from './theme';
 import type { Lang } from './i18n';
 import { t } from './i18n';
+import { buildModel } from './tariffModel';
 import './index.css';
 
 // Matches mockup: active tab = white bg + purple text + shadow; container = border-sub bg
@@ -38,7 +38,6 @@ function CheckIcon() {
 export default function App() {
   const [data, setData] = useState<PricesData | null>(null);
   const [type, setType] = useState<ChargingType>('ac');
-  const [blockingSubType, setBlockingSubType] = useState<'ac' | 'dc'>('ac');
   const [lang, setLang] = useState<Lang>('en');
 
   const theme = light;
@@ -67,24 +66,30 @@ export default function App() {
       for (const lp of latest.providers) {
         const pp = prev.providers.find(p => p.id === lp.id);
         if (!pp) continue;
-        const lAc = lp.tiers[0]?.ac?.median, pAc = pp.tiers[0]?.ac?.median;
-        if (lAc !== pAc && lAc != null && pAc != null) recentChanges.push({ provider: lp.name, type: 'ac', oldPrice: pAc, newPrice: lAc, date: latest.date });
-        const lDc = lp.tiers[0]?.dc?.median, pDc = pp.tiers[0]?.dc?.median;
-        if (lDc !== pDc && lDc != null && pDc != null) recentChanges.push({ provider: lp.name, type: 'dc', oldPrice: pDc, newPrice: lDc, date: latest.date });
+        for (const lt of lp.tiers) {
+          // Only compare the same tier; a changed tier structure is not a price change
+          const pt = pp.tiers.find(x => x.tier === lt.tier);
+          if (!pt) continue;
+          const provider = lt.tier ? `${lp.name} – ${lt.tier}` : lp.name;
+          const lAc = lt.ac?.median, pAc = pt.ac?.median;
+          if (lAc !== pAc && lAc != null && pAc != null) recentChanges.push({ provider, type: 'ac', oldPrice: pAc, newPrice: lAc, date: latest.date });
+          const lDc = lt.dc?.median, pDc = pt.dc?.median;
+          if (lDc !== pDc && lDc != null && pDc != null) recentChanges.push({ provider, type: 'dc', oldPrice: pDc, newPrice: lDc, date: latest.date });
+        }
       }
     }
   }
 
+  const model = buildModel(type, competitors, elliProviders, lang);
+
   return (
-    <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.2s, color 0.2s' }}>
+    <>
+    <div className="no-print" style={{ minHeight: '100vh', background: theme.bg }}>
       <Header
         lastUpdated={data.lastUpdated} theme={theme}
         lang={lang} onToggleLang={() => setLang(l => (l === 'en' ? 'de' : 'en'))} onExportPdf={() => window.print()}
       />
 
-      <div className="print-only" style={{ padding: '8px 32px', fontSize: 12, color: theme.textMuted }}>
-        {t(lang, 'pricingCaptured')}: {new Date(data.lastUpdated).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
-      </div>
 
       <div style={{ padding: '24px 32px', maxWidth: 1200, margin: '0 auto' }}>
         <PriceChangeAlert changes={recentChanges} theme={theme} />
@@ -151,26 +156,10 @@ export default function App() {
               </div>
             </div>
 
-            {type === 'blocking' ? (
-              <>
-                <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>
-                  {(['ac', 'dc'] as const).map(sub => (
-                    <button key={sub} onClick={() => setBlockingSubType(sub)} style={{
-                      height: 26, padding: '0 14px', borderRadius: 20,
-                      border: `1px solid ${theme.border}`,
-                      background: blockingSubType === sub ? theme.border : 'transparent',
-                      color: blockingSubType === sub ? theme.text : theme.textMuted,
-                      fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                    }}>{sub.toUpperCase()}</button>
-                  ))}
-                </div>
-                <BlockingFeeChart competitors={competitors} elliProviders={elliProviders} type={blockingSubType} theme={theme} lang={lang} />
-              </>
-            ) : type === 'base' ? (
-              <BaseFeeChart competitors={competitors} elliProviders={elliProviders} theme={theme} lang={lang} />
-            ) : (
-              <PriceCorridorChart competitors={competitors} elliProviders={elliProviders} type={type} theme={theme} lang={lang} />
-            )}
+            <p style={{ fontSize: 13, color: theme.textMuted, margin: '-8px 0 16px' }}>
+              {t(lang, model.introKey)} {t(lang, 'hoverHint')}
+            </p>
+            <TariffDotChart model={model} theme={theme} lang={lang} />
           </div>
         </section>
 
@@ -180,5 +169,10 @@ export default function App() {
         </p>
       </div>
     </div>
+    <PdfReport
+      competitors={competitors} elliProviders={elliProviders}
+      lastUpdated={data.lastUpdated} theme={theme} lang={lang}
+    />
+    </>
   );
 }

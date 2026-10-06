@@ -36,16 +36,11 @@ export default function Header({ lastUpdated, theme, lang, onToggleLang, onExpor
       justifyContent: 'space-between',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* Logo: black PNG recolored to Elli purple via CSS filter */}
+        {/* Exact brand file: native purple, natural aspect ratio (width follows height) */}
         <img
           src="/elli-logo.png"
           alt="Elli"
-          height={24}
-          style={{
-            display: 'block',
-            maxWidth: '60px',
-            filter: 'invert(28%) sepia(60%) saturate(900%) hue-rotate(240deg) brightness(80%)',
-          }}
+          style={{ display: 'block', height: 34, width: 'auto' }}
         />
         <div style={{ width: 1, height: 28, background: theme.border }} />
         <div>
