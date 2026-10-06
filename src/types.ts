@@ -12,7 +12,7 @@ export interface CompetitorPricePoint {
 export interface CompetitorTier {
   tier: string | null;
   ac: CompetitorPricePoint;
-  dc: CompetitorPricePoint;
+  dc: CompetitorPricePoint | null;
   packet?: PacketRow[];
 }
 

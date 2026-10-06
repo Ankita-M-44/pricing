@@ -25,6 +25,11 @@ function fmt(v: number): string {
   return v.toFixed(2).replace('.', ',');
 }
 
+// "S" -> "Tier S"; names like "Level 3" are shown as they are
+function tierName(label: string): string {
+  return label.length === 1 ? `Tier ${label}` : label;
+}
+
 // 5 axis labels evenly spaced: 0.20, 0.38, 0.55, 0.73, 0.90
 const AXIS_LABELS = [0.20, 0.375, 0.55, 0.725, 0.90];
 
@@ -34,10 +39,11 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
   const rows: Array<{ label: string; sublabel?: string; provider: CompetitorProvider; tierIdx: number }> = [];
   for (const p of competitors) {
     p.tiers.forEach((tier, i) => {
+      if (!tier[type]) return; // e.g. DKV Level 5 has no DC price
       const tierLabel = p.tiers.length > 1 && tier.tier ? tier.tier : undefined;
       rows.push({
         label: p.name,
-        sublabel: tierLabel ? `Tier ${tierLabel}` : undefined,
+        sublabel: tierLabel ? tierName(tierLabel) : undefined,
         provider: p,
         tierIdx: i,
       });
@@ -133,12 +139,15 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
           {/* Competitor rows */}
           {rows.map((row, ri) => {
             const tier = row.provider.tiers[row.tierIdx];
-            const pp = tier[type];
+            const pp = tier[type]!;
             const minLeft = `${pct(pp.min)}%`;
             const maxLeft = `${pct(pp.max)}%`;
             const midLeft = `${pct((pp.min + pp.max) / 2)}%`;
             const barWidth = `${pct(pp.max) - pct(pp.min)}%`;
-            const packet = tier.packet ?? row.provider.packet;
+            // A tier packet holds that tier's prices; add the provider's shared fee rows below it
+            const packet = tier.packet
+              ? [...tier.packet, ...(row.provider.packet ?? []).filter(r => !/^(AC|DC)-Ladung$/.test(r.label))]
+              : row.provider.packet;
             const isHovered = hovered?.rowIdx === ri;
 
             return (
@@ -189,7 +198,7 @@ export default function PriceCorridorChart({ competitors, elliProviders, type, t
                     pointerEvents: 'none',
                   }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: theme.text, marginBottom: 8 }}>
-                      {row.provider.name}{tier.tier ? ` – Tier ${tier.tier}` : ''}
+                      {row.provider.name}{tier.tier ? ` – ${tierName(tier.tier)}` : ''}
                     </div>
                     {packet.map((pr, i) => (
                       <div key={i} style={{

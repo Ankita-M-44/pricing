@@ -6,13 +6,13 @@ import BaseFeeChart from './components/BaseFeeChart';
 import ElliPricingCard from './components/ElliPricingCard';
 import PriceChangeAlert from './components/PriceChangeAlert';
 import type { PricesData, ChargingType, CompetitorProvider, ElliProvider } from './types';
-import { dark, light } from './theme';
+import { light } from './theme';
 import type { Lang } from './i18n';
 import { t } from './i18n';
 import './index.css';
 
 // Matches mockup: active tab = white bg + purple text + shadow; container = border-sub bg
-function TabButton({ active, onClick, children, theme }: { active: boolean; onClick: () => void; children: React.ReactNode; theme: typeof dark }) {
+function TabButton({ active, onClick, children, theme }: { active: boolean; onClick: () => void; children: React.ReactNode; theme: typeof light }) {
   return (
     <button onClick={onClick} style={{
       height: 30, padding: '0 18px', borderRadius: 6, border: 'none', cursor: 'pointer',
@@ -39,10 +39,9 @@ export default function App() {
   const [data, setData] = useState<PricesData | null>(null);
   const [type, setType] = useState<ChargingType>('ac');
   const [blockingSubType, setBlockingSubType] = useState<'ac' | 'dc'>('ac');
-  const [isDark, setIsDark] = useState(false);
   const [lang, setLang] = useState<Lang>('en');
 
-  const theme = isDark ? dark : light;
+  const theme = light;
 
   useEffect(() => {
     fetch('/data/prices.json').then(r => r.json()).then(setData);
@@ -79,7 +78,7 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', background: theme.bg, transition: 'background 0.2s, color 0.2s' }}>
       <Header
-        lastUpdated={data.lastUpdated} isDark={isDark} onToggleTheme={() => setIsDark(d => !d)} theme={theme}
+        lastUpdated={data.lastUpdated} theme={theme}
         lang={lang} onToggleLang={() => setLang(l => (l === 'en' ? 'de' : 'en'))} onExportPdf={() => window.print()}
       />
 

@@ -19,10 +19,14 @@ class PricePoint:
 class TierPrice:
     tier: Optional[str]
     ac: PricePoint
-    dc: PricePoint
+    dc: Optional[PricePoint]
+    packet: Optional[list] = None
 
     def to_dict(self):
-        return {"tier": self.tier, "ac": self.ac.to_dict(), "dc": self.dc.to_dict()}
+        d = {"tier": self.tier, "ac": self.ac.to_dict(), "dc": self.dc.to_dict() if self.dc else None}
+        if self.packet:
+            d["packet"] = self.packet
+        return d
 
 
 def parse_euro(text: str) -> Optional[float]:
