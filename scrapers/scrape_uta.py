@@ -39,6 +39,8 @@ class UTAScraper(BaseScraper):
 
         prices = _extract_kwh_prices(text)
         print(f"UTA: found prices: {prices}")
+        print(f"UTA DEBUG: PDF text length={len(text)}")
+        print(f"UTA DEBUG: full text: {text[:3000]!r}")
 
         if len(prices) >= 2:
             ac, dc = prices[0], prices[-1]

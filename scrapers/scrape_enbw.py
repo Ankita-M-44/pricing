@@ -83,6 +83,12 @@ class EnBWScraper(BaseScraper):
                 print(f"EnBW sample: {text[:800]}")
             return list(FALLBACK.values())
 
+        # DEBUG: dump context around each ct/kWh occurrence to see actual tier labeling
+        print("EnBW DEBUG: dumping context around each ct/kWh match:")
+        for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', text, re.IGNORECASE):
+            start = max(0, m.start() - 200)
+            print(f"  ...{text[start:m.end()+50]!r}...")
+
         results = {}
         for tier_name in ["S", "M", "L"]:
             pattern = rf'(?:Tarif\s*{tier_name}|{tier_name}\s*-\s*Tarif)[^\n]{{0,200}}?(\d+[,\.]\d+\s*ct\s*/?\s*kWh)'
