@@ -145,6 +145,10 @@ def ocr_image_url(url: str, timeout: int = 20000) -> str:
     Screenshot an image/SVG URL with Playwright and run Tesseract OCR on it.
     Used for content that's rendered as a graphic rather than page text
     (e.g. tariff illustrations). Returns the raw OCR'd text, or "" on failure.
+
+    Uses a fixed-viewport screenshot rather than full_page=True — standalone
+    SVG documents can make Playwright's full-page layout stability check hang
+    indefinitely (observed as "waiting for fonts to load" never resolving).
     """
     import pytesseract
     from PIL import Image
@@ -152,10 +156,10 @@ def ocr_image_url(url: str, timeout: int = 20000) -> str:
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={"width": 800, "height": 800})
+        page = browser.new_page(viewport={"width": 1000, "height": 1000})
         try:
-            page.goto(url, timeout=timeout, wait_until="networkidle")
-            png_bytes = page.screenshot(full_page=True)
+            page.goto(url, timeout=timeout, wait_until="load")
+            png_bytes = page.screenshot(timeout=15000)
         finally:
             browser.close()
 
