@@ -1,22 +1,21 @@
 """
 Scraper for EnBW fleet tariffs.
 Target: https://www.enbw.com/elektromobilitaet/geschaeftskunden/enbw-mobilityplus-business/professional
-EnBW renders the Business Ladetarif S/M/L prices as SVG illustrations, not
-page text — the page itself only has alt text like "Illustration des
-Business Ladetarif S; Stand: 01.10.2026" plus a linked .svg image URL.
-If the SVG contains real <text> elements (common for vector illustrations),
-we parse the ct/kWh values directly out of the SVG XML.
+EnBW renders the Business Ladetarif S/M/L prices as SVG illustrations
+(rasterized, not vector text) — the page itself only has alt text like
+"Illustration des Business Ladetarif S; Stand: 01.10.2026" plus a linked
+.svg image URL. We screenshot each tier's SVG and run Tesseract OCR on it
+to read the ct/kWh value off the image.
 
-Last manually verified: 2026-08-05 (S/M/L figures below)
+Last manually verified: 2026-08-05 (S/M/L figures below, used as fallback)
 Tier S: 56 ct/kWh regular (51 promo), other operators ab 56, max 89 ct/kWh
 Tier M: 46 ct/kWh regular (41 promo), other operators ab 56, max 89 ct/kWh
 Tier L: 39 ct/kWh regular (34 promo), other operators ab 56, max 89 ct/kWh
 Promo valid 08.07–30.09.2026.
 """
 import re
-import requests
 from base_scraper import BaseScraper, TierPrice, PricePoint
-from browser import fetch_text
+from browser import fetch_text, ocr_image_url
 
 TARGET_URL = "https://www.enbw.com/elektromobilitaet/geschaeftskunden/enbw-mobilityplus-business/professional"
 
@@ -38,9 +37,9 @@ def _find_tier_svg_urls(text: str) -> dict[str, str]:
     return urls
 
 
-def _parse_ct_kwh_from_svg(svg_text: str) -> list[float]:
+def _parse_ct_kwh_from_ocr(ocr_text: str) -> list[float]:
     prices = []
-    for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', svg_text, re.IGNORECASE):
+    for m in re.finditer(r'(\d+[,\.]\d+)\s*ct\s*/?\s*kWh', ocr_text, re.IGNORECASE):
         raw = m.group(1).replace(',', '.')
         try:
             val = float(raw) / 100.0
@@ -82,13 +81,13 @@ class EnBWScraper(BaseScraper):
                 results[tier_name] = FALLBACK[tier_name]
                 continue
             try:
-                resp = requests.get(url, timeout=20)
-                resp.raise_for_status()
-                prices = _parse_ct_kwh_from_svg(resp.text)
-                print(f"EnBW {tier_name}: SVG prices={prices}")
+                ocr_text = ocr_image_url(url)
+                print(f"EnBW {tier_name}: OCR text={ocr_text!r}")
+                prices = _parse_ct_kwh_from_ocr(ocr_text)
+                print(f"EnBW {tier_name}: OCR prices={prices}")
                 results[tier_name] = _prices_to_tier(tier_name, prices) if prices else FALLBACK[tier_name]
             except Exception as e:
-                print(f"EnBW {tier_name}: SVG fetch error: {e}, using fallback")
+                print(f"EnBW {tier_name}: OCR error: {e}, using fallback")
                 results[tier_name] = FALLBACK[tier_name]
 
         return [results["S"], results["M"], results["L"]]
