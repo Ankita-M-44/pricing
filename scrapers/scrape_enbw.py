@@ -83,6 +83,13 @@ class EnBWScraper(BaseScraper):
                 print(f"EnBW sample: {text[:800]}")
             return list(FALLBACK.values())
 
+        # DEBUG: find the Tarifoptionen section and dump surrounding text
+        idx = text.find("Tarifoptionen")
+        if idx >= 0:
+            print(f"EnBW DEBUG Tarifoptionen context: {text[idx:idx+1500]!r}")
+        else:
+            print("EnBW DEBUG: 'Tarifoptionen' not found in page text")
+
         results = {}
         for tier_name in ["S", "M", "L"]:
             pattern = rf'(?:Tarif\s*{tier_name}|{tier_name}\s*-\s*Tarif)[^\n]{{0,200}}?(\d+[,\.]\d+\s*ct\s*/?\s*kWh)'
