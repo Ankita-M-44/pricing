@@ -1,6 +1,6 @@
 """
 Scraper for EnBW fleet tariffs.
-Target: https://www.enbw.com/elektromobilitaet/produkte/ladetarife
+Target: https://www.enbw.com/elektromobilitaet/geschaeftskunden/enbw-mobilityplus-business/professional
 EnBW displays prices in ct/kWh (e.g. "42,86 ct/kWh") — must divide by 100.
 
 Last manually verified: 2026-08-05
@@ -13,7 +13,7 @@ import re
 from base_scraper import BaseScraper, TierPrice, PricePoint
 from browser import fetch_text
 
-TARGET_URL = "https://www.enbw.com/elektromobilitaet/produkte/ladetarife"
+TARGET_URL = "https://www.enbw.com/elektromobilitaet/geschaeftskunden/enbw-mobilityplus-business/professional"
 
 FALLBACK = {
     "S": TierPrice("S", PricePoint(0.51, 0.89, 0.56), PricePoint(0.51, 0.89, 0.56)),

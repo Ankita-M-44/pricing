@@ -1,6 +1,7 @@
 """
 Scraper for Aral pulse fleet charging pricing.
-Target: https://www.aralpulse.com/de/flotte
+Target: https://www.aral.de/de/global/retail/pulse/tarife-bezahlmethoden.html
+(aralpulse.com domain is dead/DNS fails as of 2026-08)
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
@@ -8,7 +9,6 @@ from browser import fetch_text
 
 FALLBACK = TierPrice(None, PricePoint(0.41, 0.68, 0.41), PricePoint(0.49, 0.79, 0.79))
 TARGET_URLS = [
-    "https://www.aralpulse.com/de/flotte",
     "https://www.aral.de/de/global/retail/pulse/tarife-bezahlmethoden.html",
 ]
 
