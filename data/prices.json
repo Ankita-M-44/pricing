@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-10-06T12:42:01.522409+00:00",
+  "lastUpdated": "2026-10-06T12:58:04.450481+00:00",
   "providers": [
     {
       "id": "enbw",
@@ -278,17 +278,97 @@
       "isElli": false,
       "tiers": [
         {
-          "tier": null,
+          "tier": "Budget",
           "ac": {
             "min": 0.28,
-            "max": 0.69,
-            "median": 0.46
+            "max": 0.28,
+            "median": 0.28
           },
           "dc": {
             "min": 0.52,
-            "max": 0.76,
+            "max": 0.52,
+            "median": 0.52
+          },
+          "packet": [
+            {
+              "label": "AC-Ladung",
+              "value": "0,28 €/kWh"
+            },
+            {
+              "label": "DC-Ladung",
+              "value": "0,52 €/kWh"
+            },
+            {
+              "label": "Beispiel-Betreiber AC",
+              "value": "HamburgerEnergiewerke, EDEKA, Lidl, Kaufland"
+            },
+            {
+              "label": "Beispiel-Betreiber DC",
+              "value": "Kaufland, EDEKA, Hamburger Energiewerke, Autostrom.plus, Vattenfall"
+            }
+          ]
+        },
+        {
+          "tier": "Standard",
+          "ac": {
+            "min": 0.46,
+            "max": 0.46,
+            "median": 0.46
+          },
+          "dc": {
+            "min": 0.66,
+            "max": 0.66,
             "median": 0.66
-          }
+          },
+          "packet": [
+            {
+              "label": "AC-Ladung",
+              "value": "0,46 €/kWh"
+            },
+            {
+              "label": "DC-Ladung",
+              "value": "0,66 €/kWh"
+            },
+            {
+              "label": "Beispiel-Betreiber AC",
+              "value": "E.ON Drive infrastructure, reev GmbH, ALDI Süd"
+            },
+            {
+              "label": "Beispiel-Betreiber DC",
+              "value": "Mer Germany, E.ON Drive, Fastned"
+            }
+          ]
+        },
+        {
+          "tier": "High-Price",
+          "ac": {
+            "min": 0.69,
+            "max": 0.69,
+            "median": 0.69
+          },
+          "dc": {
+            "min": 0.76,
+            "max": 0.76,
+            "median": 0.76
+          },
+          "packet": [
+            {
+              "label": "AC-Ladung",
+              "value": "0,69 €/kWh"
+            },
+            {
+              "label": "DC-Ladung",
+              "value": "0,76 €/kWh"
+            },
+            {
+              "label": "Beispiel-Betreiber AC",
+              "value": "Volkswagen Group Charging / Elli, vaylens, E.ON Solution, Virta Germany, Chargepoint / has.to.be, Wirelane"
+            },
+            {
+              "label": "Beispiel-Betreiber DC",
+              "value": "CITYWATT, Vaylens, Virta Germany, MOON POWER, EWE Go GmbH, Pfalzwerke"
+            }
+          ]
         }
       ],
       "blockingFees": {
@@ -3564,6 +3644,351 @@
                 "max": 0.76,
                 "median": 0.66
               }
+            }
+          ]
+        },
+        {
+          "id": "shell",
+          "name": "Shell",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.39,
+                "max": 0.64,
+                "median": 0.39
+              },
+              "dc": {
+                "min": 0.44,
+                "max": 0.74,
+                "median": 0.74
+              }
+            }
+          ]
+        },
+        {
+          "id": "aral",
+          "name": "Aral pulse",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": null,
+              "ac": {
+                "min": 0.39,
+                "max": 0.68,
+                "median": 0.39
+              },
+              "dc": {
+                "min": 0.49,
+                "max": 0.79,
+                "median": 0.79
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-10-06T12:58:04.450466+00:00",
+      "providers": [
+        {
+          "id": "enbw",
+          "name": "EnBW",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": "S",
+              "ac": {
+                "min": 0.4706,
+                "max": 0.7479,
+                "median": 0.4706
+              },
+              "dc": {
+                "min": 0.4706,
+                "max": 0.7479,
+                "median": 0.4706
+              }
+            },
+            {
+              "tier": "M",
+              "ac": {
+                "min": 0.3866,
+                "max": 0.7479,
+                "median": 0.3866
+              },
+              "dc": {
+                "min": 0.3866,
+                "max": 0.7479,
+                "median": 0.3866
+              }
+            },
+            {
+              "tier": "L",
+              "ac": {
+                "min": 0.3277,
+                "max": 0.7479,
+                "median": 0.3277
+              },
+              "dc": {
+                "min": 0.3277,
+                "max": 0.7479,
+                "median": 0.3277
+              }
+            }
+          ]
+        },
+        {
+          "id": "dkv",
+          "name": "DKV",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": "Level 1",
+              "ac": {
+                "min": 0.28,
+                "max": 0.28,
+                "median": 0.28
+              },
+              "dc": {
+                "min": 0.52,
+                "max": 0.52,
+                "median": 0.52
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,28 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,52 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "Sachsenenergie, Techem, 50five"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "Kaufland, Lidl, Sachsenenergie"
+                }
+              ]
+            },
+            {
+              "tier": "Level 2",
+              "ac": {
+                "min": 0.36,
+                "max": 0.36,
+                "median": 0.36
+              },
+              "dc": {
+                "min": 0.58,
+                "max": 0.58,
+                "median": 0.58
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,36 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,58 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "Vattenfall, Chargepoint, eflux"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "Vattenfall, Hamburger Energiewerke, Edeka, Tesla"
+                }
+              ]
+            },
+            {
+              "tier": "Level 3",
+              "ac": {
+                "min": 0.45,
+                "max": 0.45,
+                "median": 0.45
+              },
+              "dc": {
+                "min": 0.64,
+                "max": 0.64,
+                "median": 0.64
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,45 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,64 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "eze Network, Stadtwerke Düsseldorf und Berlin"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "Aral, Shell, Allego"
+                }
+              ]
+            },
+            {
+              "tier": "Level 4",
+              "ac": {
+                "min": 0.55,
+                "max": 0.55,
+                "median": 0.55
+              },
+              "dc": {
+                "min": 0.69,
+                "max": 0.69,
+                "median": 0.69
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,55 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,69 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "Mennekes, Fric & Co, Stadtwerke Stuttgart"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "EnBW, Eon, Fastned, Mer, Ionity"
+                }
+              ]
+            },
+            {
+              "tier": "Level 5",
+              "ac": {
+                "min": 0.65,
+                "max": 0.65,
+                "median": 0.65
+              },
+              "dc": null,
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,65 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "nicht verfügbar"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "Vaylens, reev, Solid"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "uta",
+          "name": "UTA",
+          "isElli": false,
+          "tiers": [
+            {
+              "tier": "Budget",
+              "ac": {
+                "min": 0.28,
+                "max": 0.28,
+                "median": 0.28
+              },
+              "dc": {
+                "min": 0.52,
+                "max": 0.52,
+                "median": 0.52
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,28 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,52 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "HamburgerEnergiewerke, EDEKA, Lidl, Kaufland"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "Kaufland, EDEKA, Hamburger Energiewerke, Autostrom.plus, Vattenfall"
+                }
+              ]
+            },
+            {
+              "tier": "Standard",
+              "ac": {
+                "min": 0.46,
+                "max": 0.46,
+                "median": 0.46
+              },
+              "dc": {
+                "min": 0.66,
+                "max": 0.66,
+                "median": 0.66
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,46 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,66 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "E.ON Drive infrastructure, reev GmbH, ALDI Süd"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "Mer Germany, E.ON Drive, Fastned"
+                }
+              ]
+            },
+            {
+              "tier": "High-Price",
+              "ac": {
+                "min": 0.69,
+                "max": 0.69,
+                "median": 0.69
+              },
+              "dc": {
+                "min": 0.76,
+                "max": 0.76,
+                "median": 0.76
+              },
+              "packet": [
+                {
+                  "label": "AC-Ladung",
+                  "value": "0,69 €/kWh"
+                },
+                {
+                  "label": "DC-Ladung",
+                  "value": "0,76 €/kWh"
+                },
+                {
+                  "label": "Beispiel-Betreiber AC",
+                  "value": "Volkswagen Group Charging / Elli, vaylens, E.ON Solution, Virta Germany, Chargepoint / has.to.be, Wirelane"
+                },
+                {
+                  "label": "Beispiel-Betreiber DC",
+                  "value": "CITYWATT, Vaylens, Virta Germany, MOON POWER, EWE Go GmbH, Pfalzwerke"
+                }
+              ]
             }
           ]
         },
