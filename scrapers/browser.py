@@ -1,8 +1,8 @@
 """
-Shared stealth browser factory.
-Uses playwright-stealth to avoid bot detection (403s from Cloudflare etc).
-Falls back to Firecrawl API if FIRECRAWL_API_KEY env var is set and the
-page still returns a bot-detection response.
+Shared page-fetching layer for scrapers.
+Tries Tavily Extract first (no browser needed, handles most bot walls).
+Falls back to stealth Playwright, then Firecrawl, if earlier methods
+look blocked or TAVILY_API_KEY isn't set.
 """
 import os
 import re
@@ -12,6 +12,7 @@ from playwright.sync_api import sync_playwright, Page
 from playwright_stealth import Stealth
 
 
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
 
 # Phrases that indicate a bot-detection wall rather than real content
@@ -28,26 +29,38 @@ def _looks_blocked(text: str) -> bool:
 
 def fetch_text(url: str, wait_selector: str | None = None, timeout: int = 40000) -> str:
     """
-    Fetch page text with stealth Playwright.
-    If the result looks blocked and FIRECRAWL_API_KEY is set, retries via Firecrawl.
-    Raises RuntimeError if both methods fail.
+    Fetch page text, trying each method in order until one looks unblocked:
+      1. Tavily Extract (if TAVILY_API_KEY set)
+      2. Stealth Playwright
+      3. Firecrawl (if FIRECRAWL_API_KEY set)
+    Raises RuntimeError if all available methods fail.
     """
+    attempts = []
+
+    if TAVILY_API_KEY:
+        text = _tavily_fetch(url)
+        if not _looks_blocked(text):
+            return text
+        attempts.append(f"Tavily (len={len(text)})")
+        print(f"  ⚠ Tavily fetch looks blocked for {url} (len={len(text)})")
+
     text = _playwright_fetch(url, wait_selector=wait_selector, timeout=timeout)
+    if not _looks_blocked(text):
+        return text
+    attempts.append(f"Stealth Playwright (len={len(text)})")
+    print(f"  ⚠ Stealth fetch looks blocked for {url} (len={len(text)})")
 
-    if _looks_blocked(text):
-        print(f"  ⚠ Stealth fetch looks blocked for {url} (len={len(text)})")
-        if FIRECRAWL_API_KEY:
-            print("  → Retrying via Firecrawl...")
-            text = _firecrawl_fetch(url)
-            if _looks_blocked(text):
-                raise RuntimeError(f"Both stealth and Firecrawl blocked for {url}")
-        else:
-            raise RuntimeError(
-                f"Stealth fetch blocked for {url} and FIRECRAWL_API_KEY not set. "
-                "Set the secret in GitHub Actions to enable Firecrawl fallback."
-            )
+    if FIRECRAWL_API_KEY:
+        print("  → Retrying via Firecrawl...")
+        text = _firecrawl_fetch(url)
+        if not _looks_blocked(text):
+            return text
+        attempts.append(f"Firecrawl (len={len(text)})")
 
-    return text
+    raise RuntimeError(
+        f"All fetch methods blocked for {url}: {', '.join(attempts)}. "
+        "Set TAVILY_API_KEY and/or FIRECRAWL_API_KEY secrets to enable more fallbacks."
+    )
 
 
 def _playwright_fetch(url: str, wait_selector: str | None, timeout: int) -> str:
@@ -110,6 +123,21 @@ def fetch_pdf(url: str) -> str:
     if not text:
         raise RuntimeError(f"Firecrawl returned empty content for PDF: {url}")
     return text
+
+
+def _tavily_fetch(url: str) -> str:
+    resp = _requests.post(
+        "https://api.tavily.com/extract",
+        headers={"Authorization": f"Bearer {TAVILY_API_KEY}", "Content-Type": "application/json"},
+        json={"urls": [url]},
+        timeout=60,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    results = data.get("results", [])
+    if not results:
+        return ""
+    return results[0].get("raw_content", "") or ""
 
 
 def _firecrawl_fetch(url: str) -> str:
