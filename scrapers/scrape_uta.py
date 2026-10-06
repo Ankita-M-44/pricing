@@ -1,10 +1,12 @@
 """
 Scraper for UTA Edenred fleet EV charging pricing.
 Target (PDF): https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf
-"Public Charging in Germany" section lists Budget / Standard / High-Price tiers.
+Parses the "Public Charging in Germany" table (Budget / Standard / High-Price tiers).
+The PDF renders as markdown table cells like "0,28 Operators include: ..." —
+prices are comma-decimal numbers at the start of a table cell, not suffixed with €/kWh.
 """
 import re
-from base_scraper import BaseScraper, TierPrice, PricePoint, parse_euro
+from base_scraper import BaseScraper, TierPrice, PricePoint
 from browser import fetch_pdf
 
 TARGET_URL = "https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf"
@@ -15,15 +17,32 @@ TARGET_URL = "https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf"
 FALLBACK = TierPrice(None, PricePoint(0.28, 0.69, 0.46), PricePoint(0.52, 0.76, 0.66))
 
 
-def _extract_kwh_prices(text: str) -> list[float]:
-    prices = []
-    for pat in [r'(\d+[,\.]\d+)\s*€\s*/\s*kWh', r'€\s*(\d+[,\.]\d+)\s*/\s*kWh',
-                r'(\d+[,\.]\d+)\s*Euro\s*/\s*kWh']:
-        for m in re.finditer(pat, text, re.IGNORECASE):
-            val = parse_euro(m.group(0))
-            if val and 0.10 < val < 1.50:
-                prices.append(round(val, 4))
-    return sorted(set(prices))
+def _extract_germany_table_prices(text: str) -> tuple[list[float], list[float]]:
+    """
+    Returns (ac_prices, dc_prices) for the Budget/Standard/High-Price rows
+    in the "Public Charging in Germany" table only (stops at "Premium Partner").
+    """
+    start = text.find("Public Charging in Germany")
+    if start < 0:
+        return [], []
+    end = text.find("Premium Partner", start)
+    section = text[start:end if end > 0 else start + 2000]
+
+    ac_prices, dc_prices = [], []
+    for label in ["Budget rate tier", "Standard rate tier", "High-Price rate tier"]:
+        row_start = section.find(label)
+        if row_start < 0:
+            continue
+        row_end = section.find("\n", row_start)
+        row = section[row_start:row_end] if row_end > 0 else section[row_start:row_start + 300]
+        # First two comma-decimal numbers in the row are AC, DC
+        nums = re.findall(r'(\d+,\d+)', row)
+        if len(nums) >= 1:
+            ac_prices.append(float(nums[0].replace(',', '.')))
+        if len(nums) >= 2:
+            dc_prices.append(float(nums[1].replace(',', '.')))
+
+    return ac_prices, dc_prices
 
 
 class UTAScraper(BaseScraper):
@@ -37,25 +56,18 @@ class UTAScraper(BaseScraper):
             print(f"UTA: PDF fetch error: {e}, using fallback")
             return [FALLBACK]
 
-        prices = _extract_kwh_prices(text)
-        print(f"UTA: found prices: {prices}")
-        print(f"UTA DEBUG: PDF text length={len(text)}")
-        print(f"UTA DEBUG: full text: {text[:3000]!r}")
+        ac_prices, dc_prices = _extract_germany_table_prices(text)
+        print(f"UTA: AC prices={ac_prices}, DC prices={dc_prices}")
 
-        if len(prices) >= 2:
-            ac, dc = prices[0], prices[-1]
+        if ac_prices and dc_prices:
+            ac_min, ac_max = min(ac_prices), max(ac_prices)
+            dc_min, dc_max = min(dc_prices), max(dc_prices)
             return [TierPrice(None,
-                PricePoint(min(ac, FALLBACK.ac.min), max(ac, FALLBACK.ac.max), ac),
-                PricePoint(min(dc, FALLBACK.dc.min), max(dc, FALLBACK.dc.max), dc),
-            )]
-        elif len(prices) == 1:
-            v = prices[0]
-            return [TierPrice(None,
-                PricePoint(FALLBACK.ac.min, FALLBACK.ac.max, v),
-                PricePoint(FALLBACK.dc.min, FALLBACK.dc.max, v),
+                PricePoint(ac_min, ac_max, ac_prices[1] if len(ac_prices) > 1 else ac_prices[0]),
+                PricePoint(dc_min, dc_max, dc_prices[1] if len(dc_prices) > 1 else dc_prices[0]),
             )]
 
-        print("UTA: no prices found in PDF, using fallback")
+        print("UTA: could not parse Germany tariff table, using fallback")
         return [FALLBACK]
 
 
