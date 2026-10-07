@@ -127,12 +127,6 @@ function Row({ lang, row, ri, up, theme, nameW, g, pct, ticks, interactive, open
           left: `${pct(row.bandMin)}%`, width: `${Math.max(pct(row.bandMax) - pct(row.bandMin), 0.6)}%`,
         }} />
 
-        {row.points.length === 0 && (
-          <span style={{ position: 'absolute', left: 0, top: dotCenter - 9, fontSize: 12, fontStyle: 'italic', color: theme.textMuted }}>
-            {t(lang, 'baseUnavailable')}
-          </span>
-        )}
-
         {row.points.map((pt, pi) => {
           const id = `${ri}:${pi}`;
           const isOpen = interactive && open === id;
