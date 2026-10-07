@@ -49,7 +49,7 @@ export default function TariffDotChart({ model, theme, lang, variant = 'screen' 
 
           {model.rows.map((row, ri) => (
             <Row
-              key={row.id} lang={lang} row={row} ri={ri} up={ri >= upFrom} theme={theme}
+              key={row.id} row={row} ri={ri} up={ri >= upFrom} theme={theme}
               nameW={nameW} g={g} pct={pct} ticks={model.scale.ticks.map(x => x.value)}
               interactive={interactive} open={open} setOpen={setOpen}
             />
@@ -74,7 +74,6 @@ function Legend({ swatch, label }: { swatch: React.ReactNode; label: string }) {
 }
 
 interface RowProps {
-  lang: Lang;
   row: DotRow;
   ri: number;
   up: boolean;
@@ -88,7 +87,7 @@ interface RowProps {
   setOpen: (id: string | null) => void;
 }
 
-function Row({ lang, row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setOpen }: RowProps) {
+function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setOpen }: RowProps) {
   const color = row.isElli ? ELLI : LILAC;
   const dotCenter = g.top + 20; // key label (12) + gap (4) + half the dot (4)
 
