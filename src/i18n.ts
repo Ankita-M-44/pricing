@@ -2,8 +2,8 @@ export type Lang = 'en' | 'de';
 
 const strings = {
   chartTitle: {
-    en: 'Side-by-side Fleet tariff comparison with other providers',
-    de: 'Flottentarife im direkten Vergleich mit anderen Anbietern',
+    en: 'Side-by-side Fleet tariff comparison with other providers (Germany)',
+    de: 'Flottentarife im direkten Vergleich mit anderen Anbietern (Deutschland)',
   },
   tabAc: { en: 'AC', de: 'AC' },
   tabDc: { en: 'DC', de: 'DC' },
