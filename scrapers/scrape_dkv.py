@@ -14,10 +14,6 @@ from browser import fetch_text, fetch_pdf
 TARGET_URL = "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road"
 SERVICE_FEE_PDF = "https://www.dkv-mobility.com/content/dam/dkv/assets/documents/footer/service-fee-shop/servicefeelist-fleet-webshop-de-de-de.pdf"
 
-# Maximum price per kWh DKV charges (AC and DC), as given by the product team.
-# It is not stated on the German tariff table, so it is kept here as a constant.
-MAX_PRICE = 0.75
-
 # Tarife (exkl. MwSt.) gültig ab 14.02.2026 — used if the page can't be parsed
 FALLBACK_LEVELS = {1: (0.28, 0.52), 2: (0.36, 0.58), 3: (0.45, 0.64), 4: (0.55, 0.69), 5: (0.65, None)}
 FALLBACK_OPS = {
@@ -95,8 +91,8 @@ def _build_tiers(levels, ops_ac, ops_dc) -> list[TierPrice]:
             packet.append({"label": "Beispiel-Betreiber DC", "value": ops_dc[n]})
         tiers.append(TierPrice(
             f"Level {n}",
-            PricePoint(ac, MAX_PRICE, ac),
-            PricePoint(dc, MAX_PRICE, dc) if dc is not None else None,
+            PricePoint(ac, ac, ac),
+            PricePoint(dc, dc, dc) if dc is not None else None,
             packet,
         ))
     return tiers
