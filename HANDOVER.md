@@ -79,9 +79,9 @@ These are the exact public pages/documents the scrapers read from. **Each one's 
 | **DKV** | `https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road` + `https://www.dkv-mobility.com/content/dam/dkv/assets/documents/footer/service-fee-shop/servicefeelist-fleet-webshop-de-de-de.pdf` (fee list PDF) | Per-tier charging prices + monthly card fee |
 | **UTA** | `https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf` (tariff PDF) + `https://web.uta.com/de/hilfe/wie-viel-kostet-uta-tankkarte-welche-gebühren` | Charging tariffs + card fee |
 | **Shell** | `https://www.shell.de/laden/ladetarife-fuer-ihr-elektroauto.html` | Fleet charging tariff |
-| **Aral** | `https://www.aral.de/de/global/retail/pulse/tarife-bezahlmethoden.html` (the `aralpulse.com` domain referenced as `sourceUrl` for the Aral record is dead/DNS-fails and was replaced by this `aral.de` URL as the working source) | Four tariffs (Ladesäulentarif, Klassik-Tarif, Extra-Tarif, ADAC e-Charge Tarif) + card fees |
+| **Aral** | `https://www.aral.de/de/global/retail/pulse/tarife-bezahlmethoden.html` (the `aralpulse.com` domain is dead/DNS-fails and was replaced by this `aral.de` URL as the working source) | Four tariffs (Ladesäulentarif, Klassik-Tarif, Extra-Tarif, ADAC e-Charge Tarif) + card fees |
 
-Note: `data/prices.json`'s stored `sourceUrl` field is shown to the dashboard's end users as the attribution/"verify here" link, and for Aral it currently still points at the dead `aralpulse.com` URL even though the scraper itself has moved to `aral.de` — **this is a bug worth fixing before handover is complete**: the user-facing source link should match the URL actually being scraped.
+Note: `data/prices.json`'s `sourceUrl` field is shown to the dashboard's end users as the attribution/"verify here" link. It is a manually-curated field (`run_scrapers.py` preserves it across every run rather than letting the scraper set it), so when a scraper's target URL moves, `sourceUrl` has to be updated by hand or it goes stale — this already happened once for Aral (fixed 2026-10-07, was still pointing at the dead `aralpulse.com` domain after the scraper moved to `aral.de`). Whoever owns this should either remember to keep it in sync by hand, or change the scrapers to report their own `sourceUrl` so it can't drift again.
 
 ---
 
@@ -108,7 +108,6 @@ outside engineering.
 ### Anything else worth flagging
 - **Elli's own tariffs are hardcoded** (§2) — whoever owns this needs a process (not just "remember") for updating `ELLI_PROVIDERS` in `run_scrapers.py` whenever Elli's pricing changes, or the dashboard will quietly compare against stale Elli numbers.
 - **Base fees were historically placeholders** (DKV €1.50, UTA €2.00, Shell €1.75 — see git history from August) and have since been replaced by actually-scraped values for most providers, but Shell's base fee is currently empty (`[]`) in `data/prices.json` — worth confirming whether Shell simply has no published card fee, or whether the scraper still isn't finding it.
-- **Aral `sourceUrl` bug** — see §3, the citation link shown to users points at a dead domain.
 - **No tests.** There's no automated test coverage on either the React app or the scrapers; any change is validated by eyeballing the dashboard/JSON. Worth deciding whether that's acceptable long-term given this feeds sales-facing numbers.
 - **Branch cleanup:** `claude/elli-pricing-signals-dashboard-80xts7` is an older branch this project used to live on; `claude/epic-einstein-o57hcy` is the current one. Confirm which one Vercel is actually tracking for production, and delete/archive the other to avoid confusion for the next person.
 - **Secrets custody:** `TAVILY_API_KEY` and `FIRECRAWL_API_KEY` are GitHub repo secrets under whoever currently administers this repo — the new owner needs access to rotate/renew these (both are paid third-party APIs with their own billing).
