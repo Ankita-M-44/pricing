@@ -76,7 +76,7 @@ const strings = {
   pkNote: { en: 'Note', de: 'Hinweis' },
   pkSpn: { en: 'Selected partners (IONITY, Aral)', de: 'Ausgewählte Partner (IONITY, Aral)' },
   pkEnbwNet: { en: 'EnBW network', de: 'EnBW-Netz' },
-  pkVariable: { en: 'variable (based on CPO)', de: 'variabel (je nach CPO)' },
+  pkVariable: { en: 'Variable (based on CPO)', de: 'Variabel (je nach CPO)' },
   pkBlocking: { en: 'Blocking', de: 'Blockiergebühr' },
   pkNotOffered: { en: 'not offered at this level', de: 'auf dieser Stufe nicht verfügbar' },
   pkExempt: { en: 'exempt', de: 'befreit' },

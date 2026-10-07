@@ -121,7 +121,7 @@ export default function App() {
                 <div style={{ height: 1, background: theme.borderSubtle, margin: '8px 0' }} />
                 <div style={{ fontSize: 10, fontWeight: 600, color: theme.text, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Charging fees</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  {[['AC', 'variable (based on CPO)'], ['DC', 'variable (based on CPO)']].map(([lbl, val]) => (
+                  {[['AC', 'Variable (based on CPO)'], ['DC', 'Variable (based on CPO)']].map(([lbl, val]) => (
                     <div key={lbl} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 6 }}>
                       <span style={{ fontSize: 11, color: theme.textMuted }}>{lbl}</span>
                       <span style={{ fontSize: 11, fontWeight: 700, color: theme.text }}>{val}</span>
