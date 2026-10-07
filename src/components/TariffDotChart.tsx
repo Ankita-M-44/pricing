@@ -49,7 +49,7 @@ export default function TariffDotChart({ model, theme, lang, variant = 'screen' 
 
           {model.rows.map((row, ri) => (
             <Row
-              key={row.id} row={row} ri={ri} up={ri >= upFrom} theme={theme}
+              key={row.id} lang={lang} row={row} ri={ri} up={ri >= upFrom} theme={theme}
               nameW={nameW} g={g} pct={pct} ticks={model.scale.ticks.map(x => x.value)}
               interactive={interactive} open={open} setOpen={setOpen}
             />
@@ -62,6 +62,7 @@ export default function TariffDotChart({ model, theme, lang, variant = 'screen' 
           <Legend swatch={<span style={{ width: 8, height: 8, borderRadius: 4, background: ELLI }} />} label={t(lang, 'lgElli')} />
           <Legend swatch={<span style={{ width: 8, height: 8, borderRadius: 4, background: LILAC }} />} label={t(lang, 'lgTier')} />
           <Legend swatch={<span style={{ width: 28, height: 6, borderRadius: 3, background: '#EEEAF7' }} />} label={t(lang, 'lgBand')} />
+          <Legend swatch={<span style={{ width: 2, height: 10, borderRadius: 1, background: LILAC }} />} label={t(lang, 'lgMax')} />
           <span>{t(lang, 'lgVat')}</span>
         </div>
       )}
@@ -74,6 +75,7 @@ function Legend({ swatch, label }: { swatch: React.ReactNode; label: string }) {
 }
 
 interface RowProps {
+  lang: Lang;
   row: DotRow;
   ri: number;
   up: boolean;
@@ -87,7 +89,7 @@ interface RowProps {
   setOpen: (id: string | null) => void;
 }
 
-function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setOpen }: RowProps) {
+function Row({ lang, row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setOpen }: RowProps) {
   const color = row.isElli ? ELLI : LILAC;
   const dotCenter = g.top + 20; // key label (12) + gap (4) + half the dot (4)
 
@@ -125,6 +127,17 @@ function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setO
           background: row.isElli ? '#E3D9F8' : '#EEEAF7',
           left: `${pct(row.bandMin)}%`, width: `${Math.max(pct(row.bandMax) - pct(row.bandMin), 0.6)}%`,
         }} />
+
+        {row.maxMark != null && (
+          <div
+            title={`${t(lang, 'lgMax')}: ${fmt(row.maxMark)} €/kWh`}
+            style={{ position: 'absolute', top: g.top, left: `${pct(row.maxMark)}%`, transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+          >
+            <span style={{ display: 'block', height: 12, fontSize: 10, fontWeight: 500, lineHeight: '12px', color: '#7E7896' }}>{t(lang, 'max')}</span>
+            <span style={{ width: 2, height: 10, margin: '-1px 0', borderRadius: 1, background: LILAC }} />
+            <span style={{ fontSize: 11, fontWeight: 600, lineHeight: '13px', whiteSpace: 'nowrap', color: '#4A4560', fontVariantNumeric: 'tabular-nums' }}>{fmt(row.maxMark)} €</span>
+          </div>
+        )}
 
         {row.points.map((pt, pi) => {
           const id = `${ri}:${pi}`;

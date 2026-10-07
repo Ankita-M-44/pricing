@@ -87,6 +87,7 @@ const strings = {
   lgElli: { en: 'Elli tariff', de: 'Elli-Tarif' },
   lgTier: { en: 'Provider tier', de: 'Anbieter-Stufe' },
   lgBand: { en: 'Lowest to highest price', de: 'Niedrigster bis höchster Preis' },
+  lgMax: { en: 'Maximum price', de: 'H\u00f6chstpreis' },
   lgVat: { en: 'All prices excl. VAT', de: 'Alle Preise exkl. MwSt.' },
   // PDF report
   pdfLabel: { en: 'Tariff comparison', de: 'Tarifvergleich' },

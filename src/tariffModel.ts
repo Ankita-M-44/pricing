@@ -21,6 +21,8 @@ export interface DotRow {
   points: DotPoint[];
   bandMin: number;
   bandMax: number;
+  /** Stated maximum price, drawn as its own marker when it lies beyond the last dot */
+  maxMark?: number;
 }
 
 export interface Scale {
@@ -229,10 +231,12 @@ function priceRows(mode: 'ac' | 'dc', competitors: CompetitorProvider[], elli: E
 
     const count = points.length;
     const head = tiered ? `${count} ${t(lang, 'tiersCount')}` : t(lang, 'priceRange');
+    const lastDot = Math.max(...points.map(x => x.value));
     rows.push({
       id: p.id, name: p.name, isElli: false,
       sub: [head, feeSub(p, lang)].filter(Boolean).join(' · '),
       points, bandMin, bandMax,
+      maxMark: tiered && bandMax - lastDot > 0.005 ? bandMax : undefined,
     });
   }
   return rows;
