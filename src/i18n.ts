@@ -94,8 +94,8 @@ const strings = {
   pdfPage: { en: 'Page', de: 'Seite' },
   pdfOf: { en: 'of', de: 'von' },
   pdfFooter: {
-    en: 'Prices excl. VAT, as published on each provider’s website and scraped on {date}. Elli prices are the current Elli Fleet Charging tariffs. Providers can change prices at any time. This document is for internal benchmarking.',
-    de: 'Preise exkl. MwSt., wie auf der Website des jeweiligen Anbieters veröffentlicht, erfasst am {date}. Elli-Preise sind die aktuellen Elli-Fleet-Charging-Tarife. Anbieter können Preise jederzeit ändern. Dieses Dokument dient dem internen Benchmarking.',
+    en: 'Prices excl. VAT, as published on each provider\u2019s website and scraped on {date}. Elli prices are the current Elli Fleet Charging tariffs.',
+    de: 'Preise exkl. MwSt., wie auf der Website des jeweiligen Anbieters ver\u00f6ffentlicht, erfasst am {date}. Elli-Preise sind die aktuellen Elli-Fleet-Charging-Tarife.',
   },
   pdfAcTitle: { en: 'AC charging', de: 'AC-Laden' },
   pdfAcCaption: {

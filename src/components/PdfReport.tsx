@@ -58,9 +58,12 @@ export default function PdfReport({ competitors, elliProviders, lastUpdated, the
 
           <footer style={{
             marginTop: 'auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24,
-            paddingTop: 8, borderTop: `1px solid ${theme.border}`, fontSize: 10, lineHeight: '14px', color: theme.textMuted,
+            paddingTop: 8, borderTop: `1px solid ${theme.border}`, fontSize: 9.5, lineHeight: '13px', color: theme.textMuted,
           }}>
-            <div style={{ maxWidth: '82%' }}>{t(lang, 'pdfFooter').replace('{date}', date)}</div>
+            <div style={{ maxWidth: '85%' }}>
+              <div>{t(lang, 'pdfFooter').replace('{date}', date)}</div>
+              <div style={{ marginTop: 4 }}>{t(lang, 'disclaimer')}</div>
+            </div>
             <div style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{t(lang, 'pdfPage')} {i + 1} {t(lang, 'pdfOf')} {PAGES.length}</div>
           </footer>
         </section>
