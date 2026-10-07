@@ -50,6 +50,12 @@ def _parse_ct_kwh_from_ocr(ocr_text: str) -> list[float]:
     return sorted(set(prices))
 
 
+def _parse_monthly_fee(ocr_text: str) -> float | None:
+    """'zzgl. 6,71 € monatliche Grundgebühr je Nutzer*in' -> 6.71 (OCR may garble 'zzgl.')."""
+    m = re.search(r'(\d+[,.]\d+)\s*€\s*monatliche\s+Grundgeb', ocr_text)
+    return round(float(m.group(1).replace(',', '.')), 2) if m else None
+
+
 def _prices_to_tier(tier_name: str, prices: list[float]) -> TierPrice:
     fallback = FALLBACK[tier_name]
     if len(prices) >= 2:
@@ -66,7 +72,17 @@ class EnBWScraper(BaseScraper):
     provider_id = "enbw"
     provider_name = "EnBW"
 
+    def __init__(self):
+        self._fees: dict[str, float] = {}
+
+    def scrape_base_fees(self) -> list | None:
+        if len(self._fees) < 3:
+            print(f"EnBW: monthly fees read for {sorted(self._fees)} only, keeping existing values")
+            return None
+        return [{"tier": name, "amount": self._fees[name]} for name in ["S", "M", "L"]]
+
     def scrape(self) -> list[TierPrice]:
+        self._fees = {}
         text = fetch_text(TARGET_URL)
         print(f"EnBW: page text length={len(text)}")
 
@@ -84,6 +100,10 @@ class EnBWScraper(BaseScraper):
                 ocr_text = ocr_image_url(url)
                 print(f"EnBW {tier_name}: OCR text={ocr_text!r}")
                 prices = _parse_ct_kwh_from_ocr(ocr_text)
+                fee = _parse_monthly_fee(ocr_text)
+                if fee is not None:
+                    self._fees[tier_name] = fee
+                print(f"EnBW {tier_name}: monthly fee={fee}")
                 print(f"EnBW {tier_name}: OCR prices={prices}")
                 results[tier_name] = _prices_to_tier(tier_name, prices) if prices else FALLBACK[tier_name]
             except Exception as e:

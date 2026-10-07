@@ -58,7 +58,7 @@ SCRAPERS = [
 ]
 
 
-PRESERVED_FIELDS = ["blockingFees", "baseFees", "packet", "sourceUrl"]
+PRESERVED_FIELDS = ["blockingFees", "baseFees", "sourceUrl"]
 
 
 def run():
@@ -86,6 +86,15 @@ def run():
             for field in PRESERVED_FIELDS:
                 if field in existing_rec:
                     scraped[field] = existing_rec[field]
+
+            # Card fees are scraped where the provider publishes them; otherwise the curated value stays
+            try:
+                base_fees = scraper.scrape_base_fees()
+            except Exception as e:
+                print(f"  ⚠ {scraper.provider_name} base fees not updated: {e}")
+                base_fees = None
+            if base_fees is not None:
+                scraped["baseFees"] = base_fees
 
             existing_by_id[scraper.provider_id] = scraped
             history_snapshot_providers.append({"id": scraped["id"], "name": scraped["name"],

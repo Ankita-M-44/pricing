@@ -43,6 +43,16 @@ const num = (v: number) => v.toFixed(2).replace('.', ',');
 const kwh = (v: number) => `${num(v)} €/kWh`;
 const graceText = (mins: number) => (mins % 60 === 0 ? `${mins / 60} h` : `${mins} min`);
 
+// Short dot labels for long tariff names, so neighbouring labels don't collide
+const SHORT_NAMES: Record<string, string> = {
+  'Ladesäulentarif': 'Ladesäule',
+  'ADAC e-Charge Tarif': 'ADAC',
+};
+
+export function shortLabel(name: string): string {
+  return SHORT_NAMES[name] ?? name.replace(/[- ]?Tarif$/, '');
+}
+
 export function tierName(lang: Lang, key: string): string {
   return key.length === 1 ? `${t(lang, 'tierWord')} ${key}` : key;
 }
@@ -119,9 +129,15 @@ function competitorPacket(p: CompetitorProvider, tier: CompetitorTier | null, la
     { label: t(lang, 'pkDc'), value: priceText('dc') },
   ];
 
+  const dcLow = tier?.packet?.find(r => r.label === 'DC-Ladung bis 50 kW');
+  if (dcLow) rows.push({ label: t(lang, 'pkDcLow'), value: dcLow.value });
+
   const fees = p.baseFees ?? [];
   const fee = (named ? fees.find(f => f.tier === tier!.tier) : undefined) ?? fees[0];
-  if (fee) rows.push({ label: t(lang, 'pkFee'), value: `${num(fee.amount)} € ${t(lang, 'perMonth')}` });
+  rows.push({
+    label: t(lang, 'pkFee'),
+    value: fee ? `${num(fee.amount)} € ${t(lang, 'perMonth')}` : t(lang, 'pkNotAvailable'),
+  });
 
   const bf = p.blockingFees;
   if (bf) {
@@ -148,7 +164,7 @@ function competitorPacket(p: CompetitorProvider, tier: CompetitorTier | null, la
 
 function feeSub(p: CompetitorProvider, lang: Lang): string {
   const amounts = (p.baseFees ?? []).map(f => f.amount);
-  if (!amounts.length) return '';
+  if (!amounts.length) return t(lang, 'baseUnavailable');
   const lo = Math.min(...amounts), hi = Math.max(...amounts);
   if (hi === 0) return t(lang, 'noMonthlyFee');
   return lo === hi ? `${num(lo)} € ${t(lang, 'perMonth')}` : `${num(lo)} – ${num(hi)} € ${t(lang, 'perMonth')}`;
@@ -188,10 +204,10 @@ function priceRows(mode: 'ac' | 'dc', competitors: CompetitorProvider[], elli: E
       for (const tier of p.tiers) {
         const pp = tier[mode];
         if (!pp) continue;
-        const key = tier.tier ?? '';
+        const name = tier.tier ?? '';
         points.push({
-          key, value: pp.median,
-          title: key ? `${p.name} – ${tierName(lang, key)}` : p.name,
+          key: shortLabel(name), value: pp.median,
+          title: name ? `${p.name} – ${tierName(lang, name)}` : p.name,
           packet: competitorPacket(p, tier, lang),
         });
         grow(pp.min, pp.max);
@@ -279,20 +295,36 @@ function baseRows(competitors: CompetitorProvider[], elli: ElliProvider[], lang:
 
   for (const p of sortedCompetitors(competitors)) {
     const fees = p.baseFees ?? [];
-    if (!fees.length) continue;
-    const points: DotPoint[] = fees.map(f => {
-      const tier = f.tier ? p.tiers.find(x => x.tier === f.tier) ?? null : null;
+    if (!fees.length) {
+      rows.push({ id: p.id, name: p.name, isElli: false, sub: t(lang, 'baseUnavailable'), points: [], bandMin: 0, bandMax: 0 });
+      continue;
+    }
+    // Tiers with the same fee share one dot (e.g. three Aral tariffs without a monthly fee)
+    const groups = new Map<number, typeof fees>();
+    for (const f of fees) groups.set(f.amount, [...(groups.get(f.amount) ?? []), f]);
+    const points: DotPoint[] = [...groups.entries()].map(([amount, group]) => {
+      const named = group.filter(f => f.tier);
+      const feeRow = { label: t(lang, 'pkFee'), value: `${num(amount)} € ${t(lang, 'perMonth')}` };
+      if (group.length === 1) {
+        const f = group[0];
+        const tier = f.tier ? p.tiers.find(x => x.tier === f.tier) ?? null : null;
+        return {
+          key: f.tier ? shortLabel(f.tier) : '', value: amount,
+          title: f.tier ? `${p.name} – ${tierName(lang, f.tier)}` : p.name,
+          packet: competitorPacket(p, tier, lang),
+        };
+      }
       return {
-        key: f.tier ?? '', value: f.amount,
-        title: f.tier ? `${p.name} – ${tierName(lang, f.tier)}` : p.name,
-        packet: competitorPacket(p, tier, lang),
+        key: named.map(f => shortLabel(f.tier!)).join(' · '), value: amount,
+        title: `${p.name} – ${named.map(f => tierName(lang, f.tier!)).join(', ')}`,
+        packet: [feeRow],
       };
     });
     const values = points.map(x => x.value);
     const named = fees.some(f => f.tier);
     rows.push({
       id: p.id, name: p.name, isElli: false,
-      sub: named ? fees.map(f => f.tier).filter(Boolean).join(' · ') : values[0] === 0 ? t(lang, 'noMonthlyFee') : t(lang, 'oneCardFee'),
+      sub: named ? fees.map(f => shortLabel(f.tier ?? '')).filter(Boolean).join(' · ') : values[0] === 0 ? t(lang, 'noMonthlyFee') : t(lang, 'oneCardFee'),
       points, bandMin: Math.min(...values), bandMax: Math.max(...values),
     });
   }

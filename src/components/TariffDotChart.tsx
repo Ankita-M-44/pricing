@@ -49,7 +49,7 @@ export default function TariffDotChart({ model, theme, lang, variant = 'screen' 
 
           {model.rows.map((row, ri) => (
             <Row
-              key={row.id} row={row} ri={ri} up={ri >= upFrom} theme={theme}
+              key={row.id} lang={lang} row={row} ri={ri} up={ri >= upFrom} theme={theme}
               nameW={nameW} g={g} pct={pct} ticks={model.scale.ticks.map(x => x.value)}
               interactive={interactive} open={open} setOpen={setOpen}
             />
@@ -74,6 +74,7 @@ function Legend({ swatch, label }: { swatch: React.ReactNode; label: string }) {
 }
 
 interface RowProps {
+  lang: Lang;
   row: DotRow;
   ri: number;
   up: boolean;
@@ -87,9 +88,22 @@ interface RowProps {
   setOpen: (id: string | null) => void;
 }
 
-function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setOpen }: RowProps) {
+function Row({ lang, row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setOpen }: RowProps) {
   const color = row.isElli ? ELLI : LILAC;
   const dotCenter = g.top + 20; // key label (12) + gap (4) + half the dot (4)
+
+  // Neighbouring dots closer than MIN_SEP (% of the axis) push their labels apart; the dots stay put
+  const MIN_SEP = 7, PX_PER_PCT = 8;
+  const order = row.points.map((pt, i) => ({ i, x: pct(pt.value) })).sort((a, b) => a.x - b.x);
+  const shift = row.points.map(() => 0);
+  for (let k = 0; k < order.length - 1; k++) {
+    const gap = order[k + 1].x - order[k].x;
+    if (gap < MIN_SEP) {
+      const d = Math.min(40, ((MIN_SEP - gap) / 2) * PX_PER_PCT);
+      shift[order[k].i] -= d;
+      shift[order[k + 1].i] += d;
+    }
+  }
 
   return (
     <div style={{
@@ -113,28 +127,40 @@ function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setO
           left: `${pct(row.bandMin)}%`, width: `${Math.max(pct(row.bandMax) - pct(row.bandMin), 0.6)}%`,
         }} />
 
+        {row.points.length === 0 && (
+          <span style={{ position: 'absolute', left: 0, top: dotCenter - 9, fontSize: 12, fontStyle: 'italic', color: theme.textMuted }}>
+            {t(lang, 'baseUnavailable')}
+          </span>
+        )}
+
         {row.points.map((pt, pi) => {
           const id = `${ri}:${pi}`;
           const isOpen = interactive && open === id;
           const x = pct(pt.value);
           const label = `${pt.title}${pt.key && !pt.title.endsWith(pt.key) ? ` ${pt.key}` : ''}, ${fmt(pt.value)} €`;
 
+          // Dots at the very edges anchor their labels inward so long labels don't spill out of the chart
+          const anchor = x < 12 ? 'start' : x > 88 ? 'end' : 'center';
+          const labelShift: React.CSSProperties = { position: 'relative', left: shift[pi] };
           const inner = (
             <>
-              <span style={{ display: 'block', height: 12, fontSize: 10, fontWeight: 500, lineHeight: '12px', whiteSpace: 'nowrap', color: row.isElli ? '#8A63DD' : '#7E7896' }}>{pt.key}</span>
+              <span style={{ ...labelShift, display: 'block', height: 12, fontSize: 10, fontWeight: 500, lineHeight: '12px', whiteSpace: 'nowrap', color: row.isElli ? '#8A63DD' : '#7E7896' }}>{pt.key}</span>
               <span style={{ width: 8, height: 8, borderRadius: 4, background: color, boxShadow: isOpen ? `0 0 0 4px ${row.isElli ? '#E3D9F8' : '#EEEAF7'}` : 'none' }} />
-              <span style={{ fontSize: 11, fontWeight: 600, lineHeight: '13px', whiteSpace: 'nowrap', color: row.isElli ? ELLI : '#4A4560', fontVariantNumeric: 'tabular-nums' }}>{fmt(pt.value)} €</span>
+              <span style={{ ...labelShift, fontSize: 11, fontWeight: 600, lineHeight: '13px', whiteSpace: 'nowrap', color: row.isElli ? ELLI : '#4A4560', fontVariantNumeric: 'tabular-nums' }}>{fmt(pt.value)} €</span>
             </>
           );
           const innerStyle: React.CSSProperties = {
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+            display: 'flex', flexDirection: 'column', alignItems: anchor === 'start' ? 'flex-start' : anchor === 'end' ? 'flex-end' : 'center', gap: 4,
             background: 'none', border: 0, padding: '4px 6px', margin: '-4px -6px', font: 'inherit', borderRadius: 6,
           };
 
           return (
             <div
               key={pi}
-              style={{ position: 'absolute', top: g.top, left: `${x}%`, transform: 'translateX(-50%)', zIndex: isOpen ? 40 : 1 }}
+              style={{
+                position: 'absolute', top: g.top, left: `${x}%`, zIndex: isOpen ? 40 : 1,
+                transform: anchor === 'start' ? 'translateX(-4px)' : anchor === 'end' ? 'translateX(calc(-100% + 4px))' : 'translateX(-50%)',
+              }}
               onMouseEnter={interactive ? () => setOpen(id) : undefined}
               onMouseLeave={interactive ? () => setOpen(open === id ? null : open) : undefined}
             >
@@ -153,7 +179,7 @@ function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setO
 
               {isOpen && (
                 <div role="tooltip" style={{
-                  position: 'absolute', width: 330, zIndex: 50, boxSizing: 'border-box',
+                  position: 'absolute', width: 360, zIndex: 50, boxSizing: 'border-box',
                   background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '14px 18px',
                   boxShadow: '0 8px 24px rgba(43, 36, 64, 0.14)', pointerEvents: 'none', textAlign: 'left',
                   ...(x < 22 ? { left: -12 } : x > 72 ? { right: -12 } : { left: '50%', transform: 'translateX(-50%)' }),
@@ -166,7 +192,7 @@ function Row({ row, ri, up, theme, nameW, g, pct, ticks, interactive, open, setO
                       fontSize: 12, lineHeight: '16px',
                       borderTop: i > 0 ? `1px solid ${theme.borderSubtle}` : 'none',
                     }}>
-                      <span style={{ color: theme.textMuted }}>{pr.label}</span>
+                      <span style={{ color: theme.textMuted, flexShrink: 0, whiteSpace: 'nowrap' }}>{pr.label}</span>
                       <span style={{ fontWeight: 600, textAlign: 'right', color: theme.text }}>{pr.value}</span>
                     </div>
                   ))}

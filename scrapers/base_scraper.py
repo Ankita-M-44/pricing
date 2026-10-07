@@ -51,6 +51,10 @@ class BaseScraper(ABC):
         """Return a list of TierPrice objects for this provider."""
         ...
 
+    def scrape_base_fees(self) -> Optional[list]:
+        """Monthly card fees as [{"tier": str|None, "amount": float}], or None to keep the existing values."""
+        return None
+
     def to_provider_dict(self, tiers: list[TierPrice]) -> dict:
         return {
             "id": self.provider_id,

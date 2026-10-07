@@ -7,9 +7,10 @@ prices are comma-decimal numbers at the start of a table cell, not suffixed with
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint
-from browser import fetch_pdf
+from browser import fetch_pdf, fetch_text
 
 TARGET_URL = "https://web.uta.com/hubfs/UTA_eCharge_ChargingTariff_EN_2025.pdf"
+FEES_URL = "https://web.uta.com/de/hilfe/wie-viel-kostet-uta-tankkarte-welche-geb%C3%BChren"
 
 # Public Charging in Germany — Budget/Standard/High-Price tiers
 # AC: Budget 0.28, Standard 0.46, High-Price 0.69 €/kWh
@@ -100,6 +101,18 @@ class UTAScraper(BaseScraper):
 
         print("UTA: could not parse Germany tariff table, using fallback")
         return _build_tiers(FALLBACK_AC, FALLBACK_DC)
+
+
+    def scrape_base_fees(self) -> list | None:
+        """Monthly UTA eCharge fee per activated card, from the UTA help page."""
+        text = fetch_text(FEES_URL)
+        m = re.search(r'UTA eCharge beträgt\s*(\d+[,.]\d+)\s*€\s*pro Karte', text)
+        if not m:
+            print("UTA: eCharge fee not found on the help page, keeping existing value")
+            return None
+        amount = round(float(m.group(1).replace(',', '.')), 2)
+        print(f"UTA: eCharge fee {amount} €/month per card")
+        return [{"tier": None, "amount": amount}]
 
 
 if __name__ == "__main__":

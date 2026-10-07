@@ -30,14 +30,6 @@ jobs:
           playwright install chromium --with-deps
           sudo apt-get install -y tesseract-ocr tesseract-ocr-deu
 
-      - name: Debug dump (temporary)
-        env:
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-        run: |
-          cd scrapers
-          python debug_dump.py
-
       - name: Run scrapers
         env:
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}

@@ -9,9 +9,10 @@ with a per-tier packet (prices + example operators).
 """
 import re
 from base_scraper import BaseScraper, TierPrice, PricePoint
-from browser import fetch_text
+from browser import fetch_text, fetch_pdf
 
 TARGET_URL = "https://www.dkv-mobility.com/de/de/e-mobility/charging-e-vehicles/charging-on-the-road"
+SERVICE_FEE_PDF = "https://www.dkv-mobility.com/content/dam/dkv/assets/documents/footer/service-fee-shop/servicefeelist-fleet-webshop-de-de-de.pdf"
 
 # Tarife (exkl. MwSt.) gültig ab 14.02.2026 — used if the page can't be parsed
 FALLBACK_LEVELS = {1: (0.28, 0.52), 2: (0.36, 0.58), 3: (0.45, 0.64), 4: (0.55, 0.69), 5: (0.65, None)}
@@ -112,6 +113,18 @@ class DKVScraper(BaseScraper):
 
         print("DKV: could not parse the German level table, using fallback levels")
         return _build_tiers(FALLBACK_LEVELS, FALLBACK_OPS["AC"], FALLBACK_OPS["DC"])
+
+
+    def scrape_base_fees(self) -> list | None:
+        """DKV Card +Charge monthly fee, from the fleet service fee list (PDF)."""
+        text = fetch_pdf(SERVICE_FEE_PDF)
+        m = re.search(r'DKV Card\s*\+\s*Charge\s+pro\s+Monat\s*\|\s*(\d+[,.]\d+)\s*€', text)
+        if not m:
+            print("DKV: card fee not found in the service fee list, keeping existing value")
+            return None
+        amount = _num(m.group(1))
+        print(f"DKV: card fee {amount} €/month")
+        return [{"tier": None, "amount": amount}]
 
 
 if __name__ == "__main__":
